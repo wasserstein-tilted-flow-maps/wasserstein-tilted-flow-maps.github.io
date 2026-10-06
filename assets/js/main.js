@@ -26,8 +26,8 @@
     ['WTF (ours)', 250, 0.330, 20.45, 0.718, 0.460, 0.177, true],
   ];
   const NOTES = {
-    t2i: 'TiM-T2I, HPSv2 as the training reward. Every method fine-tuned under the same budget of roughly 48 GPU-hours on one 8×H100 node; WTF is one fine-tuned flow map evaluated at four inference budgets. Highest value among fine-tuned methods in each reward column is highlighted.',
-    imagenet: 'DMF-XL/2, HPSv2 as the training reward. WTF is evaluated at 1 and 250 NFE from the same fine-tuned flow map; WTF results are means over three matched seeds. Highest value among fine-tuned methods in each reward column is highlighted.',
+    t2i: 'TiM-T2I, HPSv2 as the training reward. Every method is fine-tuned under the same budget of roughly 48 GPU-hours on one 8×H100 node. WTF is one fine-tuned flow map evaluated at four inference budgets. Highest value among fine-tuned methods in each reward column is highlighted.',
+    imagenet: 'DMF-XL/2, HPSv2 as the training reward. WTF is evaluated at 1 and 250 NFE from the same fine-tuned flow map, and its results are means over three matched seeds. Highest value among fine-tuned methods in each reward column is highlighted.',
   };
 
   function buildTable(rows, id) {
@@ -121,4 +121,12 @@
     }));
     sync();
   }
+})();
+
+/* review aid: ?review loads every lazy image and the animation up front (for full-page screenshots) */
+(() => {
+  if (!new URLSearchParams(location.search).has("review")) return;
+  document.querySelectorAll("img[loading=lazy]").forEach(i => { i.loading = "eager"; });
+  const v = document.getElementById("tilt-anim");
+  if (v) { v.poster = v.dataset.poster; v.preload = "auto"; v.load(); }
 })();

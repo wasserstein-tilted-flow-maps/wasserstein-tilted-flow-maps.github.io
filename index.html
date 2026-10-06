@@ -9,7 +9,7 @@
     content="Wasserstein-Tilted Flow Maps (WTF): reward fine-tuning with an optimal transport regularizer built from the pre-trained drift. Transports samples toward reward instead of reweighting, yields a deterministic optimal control problem, and fine-tunes flow maps end to end without simulation.">
   <meta property="og:title" content="WTF?! Simulation-Free Reinforcement Learning with Wasserstein-Tilted Flow Maps">
   <meta property="og:description"
-    content="Transport, don't reweight: the first end-to-end reward fine-tuning recipe native to flow maps, with up to 280× less training compute.">
+    content="The first end-to-end reward fine-tuning recipe native to flow maps, reaching the baselines' peak reward with up to 280× less training compute.">
   <link rel="canonical" href="https://wasserstein-tilted-flow-maps.github.io/">
   <meta property="og:url" content="https://wasserstein-tilted-flow-maps.github.io/">
   <meta property="og:image" content="https://wasserstein-tilted-flow-maps.github.io/assets/img/social.jpg">
@@ -22,9 +22,9 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="styles.css?v=30">
   <script>
-    // design option: ?theme=violet|ember|night (default violet). Review picker: ?options
+    // design option: ?theme=violet|carbon|ember|night (default violet). Review picker: ?options
     (function () {
       const q = new URLSearchParams(location.search);
       const t = q.get('theme');
@@ -44,67 +44,93 @@
     <div class="nav-links">
       <a href="#abstract">Abstract</a>
       <a href="#method">Method</a>
-      <a href="#lab">Tilt Lab</a>
+      <a href="#lab">Interactive</a>
+      <a href="#algorithm">Algorithm</a>
       <a href="#results">Results</a>
       <a href="#gallery">Gallery</a>
-      <a href="#citation">BibTeX</a>
     </div>
   </nav>
 
   <header class="hero" id="top">
     <div class="hero-bg" aria-hidden="true"></div>
-    <div class="hero-inner">
-      <p class="hero-venue">NeurIPS 2026 · <span class="venue-badge">Spotlight</span></p>
-      <span class="hero-mark">WTF?!</span>
-      <h1>Simulation-Free Reinforcement Learning <br>with <span class="nobr">Wasserstein-Tilted</span> Flow Maps</h1>
-      <p class="hero-tagline">
-        Reward fine-tuning that <strong>transports</strong> samples toward high reward instead of
-        <strong>reweighting</strong> them, and trains the flow map itself, end to end, without simulating the flow.
-      </p>
+    <div class="hero-inner hero-stack">
+      <div class="hero-text">
+        <p class="hero-venue">NeurIPS 2026 · <span class="venue-badge">Spotlight</span></p>
+        <span class="hero-mark">WTF?!</span>
+        <h1>Simulation-Free Reinforcement Learning <br>with <span class="nobr">Wasserstein-Tilted</span> Flow Maps</h1>
 
-      <!-- Author marks follow the paper: † = project lead, * = equal contribution. -->
-      <p class="authors">
-        <span class="au"><a href="https://abbasmammadov.github.io/" target="_blank" rel="noopener">Abbas Mammadov</a><sup>1,†,*</sup></span> ·
-        <span class="au"><a href="https://jrrhuang.github.io/" target="_blank" rel="noopener">Jerry Y. Huang</a><sup>2,†,*</sup></span> ·
-        <span class="au"><a href="https://www.linkedin.com/in/justin-lin-68a0831a1" target="_blank" rel="noopener">Justin Lin</a><sup>2,*</sup></span> ·
-        <span class="au"><a href="https://www.linkedin.com/in/parthakaushik30" target="_blank" rel="noopener">Partha Kaushik</a><sup>2</sup></span> ·
-        <span class="au"><a href="https://sheelfshah.github.io/" target="_blank" rel="noopener">Sheel Shah</a><sup>2</sup></span> ·
-        <span class="au"><a href="https://k-rt-k.github.io/" target="_blank" rel="noopener">Kartik Nair</a><sup>2</sup></span> ·
-        <span class="au"><a href="https://www.stats.ox.ac.uk/~teh/" target="_blank" rel="noopener">Yee Whye Teh</a><sup>1</sup></span> ·
-        <span class="au"><a href="https://nmboffi.github.io/" target="_blank" rel="noopener">Nicholas M. Boffi</a><sup>2</sup></span>
-      </p>
-      <p class="affiliation">
-        <sup>1</sup>University of Oxford · <sup>2</sup>Carnegie Mellon University
-      </p>
-      <p class="eq-note"><sup>†</sup>Project lead &nbsp;·&nbsp; <sup>*</sup>Equal contribution</p>
-      <p class="contact">Correspondence:
-        <a href="mailto:abbas.mammadov@stats.ox.ac.uk">abbas.mammadov@stats.ox.ac.uk</a> ·
-        <a href="mailto:jerryhua@andrew.cmu.edu">jerryhua@andrew.cmu.edu</a></p>
+        <!-- Author marks follow the paper: † = project lead, * = equal contribution. -->
+        <p class="authors">
+          <span class="au"><a href="https://abbasmammadov.github.io/" target="_blank" rel="noopener">Abbas Mammadov</a><sup>1,†,*</sup></span> ·
+          <span class="au"><a href="https://jrrhuang.github.io/" target="_blank" rel="noopener">Jerry Y. Huang</a><sup>2,†,*</sup></span> ·
+          <span class="au"><a href="https://www.linkedin.com/in/justin-lin-68a0831a1" target="_blank" rel="noopener">Justin Lin</a><sup>2,*</sup></span> ·
+          <span class="au"><a href="https://www.linkedin.com/in/parthakaushik30" target="_blank" rel="noopener">Partha Kaushik</a><sup>2</sup></span> ·
+          <span class="au"><a href="https://sheelfshah.github.io/" target="_blank" rel="noopener">Sheel Shah</a><sup>2</sup></span> ·
+          <span class="au"><a href="https://k-rt-k.github.io/" target="_blank" rel="noopener">Kartik Nair</a><sup>2</sup></span> ·
+          <span class="au"><a href="https://www.stats.ox.ac.uk/~teh/" target="_blank" rel="noopener">Yee Whye Teh</a><sup>1</sup></span> ·
+          <span class="au"><a href="https://nmboffi.github.io/" target="_blank" rel="noopener">Nicholas M. Boffi</a><sup>2</sup></span>
+        </p>
+        <p class="affiliation">
+          <sup>1</sup>University of Oxford · <sup>2</sup>Carnegie Mellon University
+        </p>
+        <p class="eq-note"><sup>†</sup>Project lead &nbsp;·&nbsp; <sup>*</sup>Equal contribution</p>
+        <p class="contact">Correspondence:
+          <a href="mailto:abbas.mammadov@stats.ox.ac.uk">abbas.mammadov@stats.ox.ac.uk</a> ·
+          <a href="mailto:jerryhua@andrew.cmu.edu">jerryhua@andrew.cmu.edu</a></p>
 
-      <div class="links" aria-label="Project links">
-        <a class="btn btn-primary" href="https://arxiv.org/abs/2609.27033" target="_blank" rel="noopener">
-          <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
-          Paper · arXiv
-        </a>
-        <a class="btn" href="https://arxiv.org/pdf/2609.27033" target="_blank" rel="noopener">PDF</a>
-        <a class="btn" href="https://github.com/wasserstein-tilted-flow-maps/WTF" target="_blank" rel="noopener">
-          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-          Code
-        </a>
-        <a class="btn" href="#citation">BibTeX</a>
-      </div>
+        <div class="links" aria-label="Project links">
+          <a class="btn btn-primary" href="https://arxiv.org/abs/2609.27033" target="_blank" rel="noopener">
+            <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+            Paper · arXiv
+          </a>
+          <a class="btn" href="https://arxiv.org/pdf/2609.27033" target="_blank" rel="noopener">PDF</a>
+          <a class="btn" href="https://github.com/wasserstein-tilted-flow-maps/WTF" target="_blank" rel="noopener">
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+            Code
+          </a>
+          <a class="btn" href="#citation">BibTeX</a>
+        </div>
+        </div>
 
-      <div class="teaser">
-        <figure>
-          <img src="assets/img/hero.jpg" width="2400" height="1308"
-            alt="Base model at 50 steps versus WTF at few steps. Left: text-to-image prompts at 4 steps (a god dreaming at the end of time, an otherworldly world in vivid colors, a skull-shaped island). Right: ImageNet-256 classes platypus, Shetland sheepdog and volcano at 1 step.">
-          <figcaption>
-            <strong>Reward-aligned generation at few steps.</strong> Flow maps fine-tuned with WTF for HPSv2, a learned
-            human-preference reward. WTF at 4 steps (text-to-image, left) and 1 step (ImageNet-256, right) matches the
-            quality of its own 50-step generation; the base model is shown at 50 steps.
-          </figcaption>
-        </figure>
-      </div>
+      <figure class="hero-figure">
+        <div class="hf">
+        <div class="hf-block">
+          <p class="hf-task">Text-to-image</p>
+          <div class="hf-groups"><span class="hf-g">Base</span><span class="hf-g hf-wtf">WTF</span></div>
+          <div class="hf-steps"><span>50 steps</span><span>4 steps</span><span>50 steps</span></div>
+          <div class="hf-grid">
+            <img src="assets/hero/t2i_00.webp" width="384" height="384" alt="The god dreaming at the end of time, base model, 50 steps" decoding="async" fetchpriority="high">
+            <img src="assets/hero/t2i_01.webp" width="384" height="384" alt="The god dreaming at the end of time, WTF, 4 steps" decoding="async" fetchpriority="high">
+            <img src="assets/hero/t2i_02.webp" width="384" height="384" alt="The god dreaming at the end of time, WTF, 50 steps" decoding="async" fetchpriority="high">
+            <img src="assets/hero/t2i_10.webp" width="384" height="384" alt="An otherworldly world by Fuco Ueda, base model, 50 steps" decoding="async" fetchpriority="high">
+            <img src="assets/hero/t2i_11.webp" width="384" height="384" alt="An otherworldly world by Fuco Ueda, WTF, 4 steps" decoding="async" fetchpriority="high">
+            <img src="assets/hero/t2i_12.webp" width="384" height="384" alt="An otherworldly world by Fuco Ueda, WTF, 50 steps" decoding="async" fetchpriority="high">
+            <img src="assets/hero/t2i_20.webp" width="384" height="384" alt="A skull-shaped island painted by Ghibli, base model, 50 steps" decoding="async" fetchpriority="high">
+            <img src="assets/hero/t2i_21.webp" width="384" height="384" alt="A skull-shaped island painted by Ghibli, WTF, 4 steps" decoding="async" fetchpriority="high">
+            <img src="assets/hero/t2i_22.webp" width="384" height="384" alt="A skull-shaped island painted by Ghibli, WTF, 50 steps" decoding="async" fetchpriority="high">
+          </div>
+        </div>
+        <div class="hf-block">
+          <p class="hf-task">ImageNet-256</p>
+          <div class="hf-groups"><span class="hf-g">Base</span><span class="hf-g hf-wtf">WTF</span></div>
+          <div class="hf-steps"><span>50 steps</span><span>1 step</span><span>50 steps</span></div>
+          <div class="hf-grid">
+            <img src="assets/hero/in_00.webp" width="384" height="384" alt="Platypus, base model, 50 steps" decoding="async" fetchpriority="high">
+            <img src="assets/hero/in_01.webp" width="384" height="384" alt="Platypus, WTF, 1 step" decoding="async" fetchpriority="high">
+            <img src="assets/hero/in_02.webp" width="384" height="384" alt="Platypus, WTF, 50 steps" decoding="async" fetchpriority="high">
+            <img src="assets/hero/in_10.webp" width="384" height="384" alt="Shetland sheepdog, base model, 50 steps" decoding="async" fetchpriority="high">
+            <img src="assets/hero/in_11.webp" width="384" height="384" alt="Shetland sheepdog, WTF, 1 step" decoding="async" fetchpriority="high">
+            <img src="assets/hero/in_12.webp" width="384" height="384" alt="Shetland sheepdog, WTF, 50 steps" decoding="async" fetchpriority="high">
+            <img src="assets/hero/in_20.webp" width="384" height="384" alt="Volcano, base model, 50 steps" decoding="async" fetchpriority="high">
+            <img src="assets/hero/in_21.webp" width="384" height="384" alt="Volcano, WTF, 1 step" decoding="async" fetchpriority="high">
+            <img src="assets/hero/in_22.webp" width="384" height="384" alt="Volcano, WTF, 50 steps" decoding="async" fetchpriority="high">
+          </div>
+        </div>
+        </div>
+        <figcaption>
+          <strong>Reward-aligned generation at few steps.</strong> Flow maps fine-tuned with WTF for HPSv2. At 4 steps (text-to-image) and 1 step (ImageNet-256), WTF matches the quality of its own 50-step samples. The base model is shown at 50 steps.
+        </figcaption>
+      </figure>
     </div>
   </header>
 
@@ -112,8 +138,7 @@
     <!-- ============================ ABSTRACT ============================ -->
     <section class="section" id="abstract">
       <div class="section-heading">
-        <span class="kicker">Abstract</span>
-        <h2>Fine-tune the flow, not a diffusion surrogate</h2>
+        <h2>Abstract</h2>
       </div>
       <div class="prose">
         <p>
@@ -141,9 +166,9 @@
       </div>
 
       <div class="highlights">
-        <div><strong>280×</strong><span>less training compute to reach Flow-GRPO's peak reward</span></div>
-        <div><strong>$O(1)$</strong><span>flow map calls per value estimate, instead of $O(T)$</span></div>
-        <div><strong>Any NFE</strong><span>one fine-tuned flow map, 1 to 250 steps, no distillation</span></div>
+        
+        <div><strong>$O(1)$</strong><span>flow map calls per value estimate</span></div>
+        <div><strong>1 to 250</strong><span>inference steps from one fine-tuned flow map</span></div>
         <div><strong>No critic</strong><span>unbiased Monte Carlo value estimator</span></div>
       </div>
     </section>
@@ -152,106 +177,64 @@
     <section class="section" id="method">
       <div class="section-heading">
         <span class="kicker">Method</span>
-        <h2>Transport, don't reweight</h2>
+        <h2>An optimal transport regularizer</h2>
+      </div>
+
+      <div class="prose">
         <p>
-          The usual target $\tilde\rho_1 \propto e^{\lambda r}\rho_1$ comes from a KL regularizer: it can only reweight
-          mass the base model already places. We instead measure deviation from the base model by how much the
-          pre-trained dynamics must be <em>steered</em>: an optimal transport cost built from the drift itself.
+          Reward fine-tuning seeks a terminal distribution that increases the expected reward while staying close to
+          the pre-trained model,
+        </p>
+        $$\tilde\rho_1=\arg\max_{\nu}\ \lambda\,\mathbb{E}_{x\sim\nu}[r(x)]-\mathcal{R}(\nu).$$
+        <p>
+          The usual choice $\mathcal{R}(\nu)=\mathrm{KL}(\nu\,\|\,\rho_1)$ gives the reward-tilted distribution
+          $\tilde\rho_1\propto e^{\lambda r}\rho_1$, which reweights the base distribution. Its pathwise form is
+          tractable for diffusions, so existing methods fine-tune a diffusion surrogate of the flow with many-step
+          stochastic rollouts. We define $\mathcal{R}$ through the deterministic flow itself. The cost $c_b$ is the
+          least residual control energy needed to steer the pre-trained drift $b_t$ from $x$ to $y$, and the
+          regularizer is the corresponding transport problem from the prior $\rho_0$.
         </p>
       </div>
+      <div class="keybox narrow">
+        $$\mathcal{T}_b(\rho_0,\nu)=\inf_{\pi\in\Pi(\rho_0,\nu)}\int c_b(x,y)\,\pi(dx\,dy),\qquad
+          c_b(x,y)=\inf_{\omega_0=x,\ \omega_1=y}\ \frac12\int_0^1\big\|\dot\omega_t-b_t(\omega_t)\big\|^2dt$$
+        <p class="framing-note">With $b\equiv 0$ the regularizer reduces to $\tfrac12 W_2^2(\rho_0,\nu)$.</p>
+      </div>
 
-      <figure class="figure-hero">
-        <img class="on-white" src="assets/img/overview.png" width="2446" height="501"
-          alt="Left: the Wasserstein tilt transports each base sample locally toward nearby high-reward regions, regularized by the transport cost T_b. Right: the reward tilt keeps mode positions fixed and only reweights mass within the existing support.">
+      <figure class="figure-hero figure-anim">
+        <div class="vidwrap on-white">
+          <video id="tilt-anim" muted loop playsinline preload="none" width="2400" height="566" data-poster="assets/video/tilt_anim_poster.jpg"
+            aria-label="As the reward weight lambda grows from 0 to 3, the Wasserstein tilt moves each mode toward nearby high reward, while the reward tilt keeps every mode in place and only changes its height.">
+            <source src="assets/video/tilt_anim.mp4" type="video/mp4">
+          </video>
+        </div>
         <figcaption>
-          <strong>Wasserstein tilt vs. reward tilt.</strong> Our Wasserstein-tilted approach transports each base sample
-          locally to improve its reward, with the displacement regularized by the transport cost $\mathcal{T}_b$.
-          Standard reward tilting keeps mode positions fixed and only reweights mass within them.
+          <strong>Wasserstein tilt and reward tilt.</strong> As the reward weight $\lambda$ grows, the Wasserstein
+          tilt transports each base sample locally toward higher reward, with the displacement regularized by
+          $\mathcal{T}_b$. The reward tilt multiplies the base density by $e^{\lambda r}$, which reweights the existing modes.
         </figcaption>
       </figure>
 
-      <div class="contrast">
-        <article>
-          <h3>KL reward tilt</h3>
-          <p>Reweights the base distribution. Its pathwise form is tractable for diffusions via Girsanov, so existing
-            methods convert the flow into a diffusion, fine-tune the diffusion, and convert back, paying for
-            many-step stochastic rollouts along the way.</p>
-        </article>
-        <article class="ours">
-          <h3>Wasserstein tilt (ours)</h3>
-          <p>Moves each sample to its best reward–cost tradeoff. The cost depends only on the deterministic flow, so the
-            problem becomes deterministic optimal control, which a flow map can solve without simulating the
-            dynamics.</p>
-        </article>
-      </div>
-
-      <h3 class="sub-heading">From a regularizer to an algorithm</h3>
-      <div class="steps">
-        <div class="eq-card">
-          <span class="eq-tag"><span class="n">1</span> An optimal transport regularizer from the pre-trained drift</span>
-          $$c_b(x,y)=\inf_{\omega_0=x,\ \omega_1=y}\ \frac12\int_0^1\big\|\dot\omega_t-b_t(\omega_t)\big\|^2dt,$$
-          $$\mathcal{T}_b(\rho_0,\nu)=\inf_{\pi\in\Pi(\rho_0,\nu)}\int c_b(x,y)\,\pi(dx\,dy)$$
-          <p>$c_b$ is the minimum residual energy needed to steer a particle from $x$ to $y$ while following the
-            pre-trained drift $b_t$. With $b\equiv 0$ it reduces to $\tfrac12 W_2^2$.</p>
-        </div>
-        <div class="eq-card">
-          <span class="eq-tag"><span class="n">2</span> The objective decouples per sample</span>
-          $$\sup_{\nu}\Big\{\lambda\,\mathbb{E}_{\nu}[r]-\mathcal{T}_b(\rho_0,\nu)\Big\}
-            =\mathbb{E}_{x\sim\rho_0}\Big[\sup_{y}\big\{\lambda\, r(y)-c_b(x,y)\big\}\Big]$$
-          <p>Every source sample travels to its own best destination: transport, not global reweighting.</p>
-        </div>
-        <div class="eq-card">
-          <span class="eq-tag"><span class="n">3</span> It is deterministic optimal control</span>
-          $$\sup_{u}\ \mathbb{E}_{x_0\sim\rho_0}\Big[\lambda\, r(x_1^u)-\frac12\int_0^1\|u_t(x_t^u)\|^2dt\Big],
-            \qquad \dot x_t^u=b_t(x_t^u)+u_t(x_t^u)$$
-          <p>The fine-tuned model is again a single drift $b_t+u^*_t$, and this problem is the rescaled
-            zero-noise limit of the stochastic control used for reward tilting.</p>
-        </div>
-      </div>
-
-      <h3 class="sub-heading">Simulation-free value estimation</h3>
-      <p class="sub-lede">
-        Policy iteration regresses the control onto the value gradient of a frozen reference. A pre-trained flow map
-        jumps between any two times in one evaluation, so the value needs no rollout and no critic.
-      </p>
-      <figure class="figure-clean">
-        <img class="on-white" src="assets/img/value_estimation.png" width="2498" height="549"
-          alt="Three ways to estimate the value gradient. Actor-critic uses a learned critic: O(1) but biased. Multi-step rollout backpropagates through T steps: unbiased but O(T) compute and memory. WTF reaches x_1 from x_t in two flow map calls and a single Jacobian backprop: unbiased, O(1), no critic.">
-        <figcaption>
-          <strong>Flow map value estimation.</strong> Actor–critic methods use a learned critic; multi-step rollouts
-          backpropagate through $T$ steps. WTF reaches $x_1$ from $x_t$ in two flow map evaluations and a single
-          Jacobian backprop, which is $O(1)$, unbiased, and needs no critic.
-        </figcaption>
-      </figure>
-
-      <div class="steps" style="margin-top:1.6rem">
-        <div class="eq-card">
-          <span class="eq-tag"><span class="n">4</span> An $O(1)$ Monte Carlo value estimate</span>
-          $$\widehat V(t,x)=\lambda\, r(x_1)-\frac{1-t}{2}\,\big\|\bar u_\tau(x_\tau)\big\|^2,$$
-          $$\tau\sim\mathrm{U}[t,1],\quad x_\tau=X^{\bar u}_{t,\tau}(x),\quad x_1=X^{\bar u}_{\tau,1}(x_\tau)$$
-          <p>The only randomness is a one-dimensional time integral, not the high-dimensional expectation behind
-            stochastic value functions.</p>
-        </div>
-        <div class="eq-card eq-card-accent">
-          <span class="eq-tag"><span class="n">5</span> The WTF training objective</span>
-          $$\mathcal{L}_{\mathrm{WTF}}(\hat w)=\mathbb{E}\Big[\big\|\hat w_{t,t}(\bar x_t)-b_t(\bar x_t)-\nabla_x\widehat V(t,\bar x_t)\big\|^2\Big]
-            +\beta\,\mathcal{L}_{\mathrm{dist}}(\hat w),\qquad \bar w=\mathrm{sg}(\hat w)$$
-          <p>Value gradient regression on the diagonal, plus flow map self-distillation off the diagonal: the output
-            stays a flow map, and the flow map keeps supplying amortized on-policy rollouts. Every population fixed
-            point is the optimal control.</p>
-        </div>
+      <div class="prose">
+        <p>
+          By Kantorovich duality, the problem decouples over source samples,
+        </p>
+        $$\sup_{\nu}\Big\{\lambda\,\mathbb{E}_{\nu}[r]-\mathcal{T}_b(\rho_0,\nu)\Big\}
+          =\mathbb{E}_{x\sim\rho_0}\Big[\sup_{y}\big\{\lambda\, r(y)-c_b(x,y)\big\}\Big],$$
+        <p>
+          so each source sample moves to the endpoint that maximizes $\lambda r(y)-c_b(x,y)$. A reward tilt preserves
+          the density ratio of any two points with equal reward, while transport can move mass between them.
+        </p>
       </div>
     </section>
 
-    <!-- ============================ TILT LAB ============================ -->
+    <!-- ============================ INTERACTIVE 1-D DEMO ============================ -->
     <section class="section" id="lab">
       <div class="section-heading">
         <span class="kicker">Interactive</span>
-        <h2>Tilt Lab</h2>
+        <h2>WTF and KL tilting in one dimension</h2>
         <p>
-          Both optima are exact here: a standard Gaussian base and a reward bump at distance $K$. Move the reward into
-          low-density regions and watch the KL tilt stall, since it can only reweight mass the base already has,
-          while the Wasserstein tilt splits into mass that stays and mass that travels.
+          Both population optima are computed without sampling, for a standard Gaussian base and a Gaussian reward bump of width $2.25$ centered at $K$. As the reward moves into lower-density regions of the base, the KL tilt can only reweight the existing mass, while the Wasserstein tilt transports part of the mass toward the reward.
         </p>
       </div>
 
@@ -289,39 +272,114 @@
         </div>
       </div>
       <p class="lab-note">
-        Computed live in your browser with the paper's closed forms: the KL tilt by quadrature, the WTF optimum by the
-        per-sample maximization above and its exact pushforward. Nothing is sampled. The paper setting reproduces
-        Figure 5 (expected reward $0.142 \to 0.367$ for KL vs. $0.617$ for WTF). A related identity holds for every
-        reweighting: two points with equal reward keep their density ratio under any tilt $\rho_1 g(r)$, whereas
-        transport can redistribute mass between them.
+        The curves are computed in your browser from the paper's closed forms, with the KL tilt by quadrature and the
+        WTF optimum by the per-sample maximization above and its exact pushforward. Nothing is sampled. At $K=4.75$ and $\lambda=7$ the paper reports an expected reward of $0.142$ for the base, $0.367$ for the KL tilt and $0.617$ for WTF.
       </p>
+
+    </section>
+
+    <!-- ============================ ALGORITHM ============================ -->
+    <section class="section" id="algorithm">
+      <div class="section-heading">
+        <span class="kicker">Algorithm</span>
+        <h2>Solving the optimal control problem</h2>
+        <p>
+          The per-sample decomposition characterizes the optimum but does not give a training algorithm. The problem is equivalent to a deterministic optimal control problem, which we solve by policy iteration using a pre-trained flow map.
+        </p>
+      </div>
+
+      <h3 class="sub-heading">An equivalent optimal control problem</h3>
+      <div class="keybox narrow">
+        $$\sup_{u}\ \mathbb{E}_{x_0\sim\rho_0}\Big[\lambda\, r(x_1^u)-\frac12\int_0^1\|u_t(x_t^u)\|^2dt\Big]
+          \quad\text{s.t.}\quad \dot x_t^u=b_t(x_t^u)+u_t(x_t^u)$$
+      </div>
+      <div class="prose">
+        <p>
+          The Wasserstein-tilted objective has the same optimal value as this control problem, and its optimal control
+          $u^*$ produces the Wasserstein-tilted distribution. The optimal model is again a single drift $b_t+u^*_t$, which replaces $b_t$ at inference.
+        </p>
+        <p>
+          The optimal control is the gradient of the optimal value, $u^*_t=\nabla_x V^*_t$. Policy iteration regresses the trainable control onto the value gradient $\nabla_x V^{\bar u}$ of a frozen reference $\bar u$ and then updates the reference. At the population level, a performance-difference identity shows that each step improves the objective until the fixed point, which is the optimal control.
+        </p>
+      </div>
+
+      <h3 class="sub-heading">Simulation-free value estimation</h3>
+      <p class="sub-lede">
+        The value gradient normally requires simulating and backpropagating through the entire future trajectory, or
+        training a critic to approximate it. A pre-trained flow map jumps between any two times in one evaluation.
+      </p>
+      <div class="valuefig" id="valuefig">
+        <article class="vf-panel" data-kind="ac" data-aria="Actor-critic: the state passes once through a learned critic network that outputs the value estimate.">
+          <div class="vf-head"><h4>Actor-critic</h4><span class="vf-calls">forward calls <b>0</b></span></div>
+          <div class="vf-stage"></div>
+          <div class="vf-bar" aria-hidden="true"><i></i></div>
+          <p>A learned critic predicts the value in one call, so the estimate is only as good as the critic.</p>
+          <ul class="vf-badges"><li class="good"><i>O</i>(1)</li><li class="bad">biased</li><li class="bad">needs a critic</li></ul>
+        </article>
+        <article class="vf-panel" data-kind="rollout" data-aria="Multi-step rollout: the state is simulated through T network calls to reach x_1, then the gradient is backpropagated through all T steps.">
+          <div class="vf-head"><h4>Multi-step rollout</h4><span class="vf-calls">forward calls <b>0</b></span></div>
+          <div class="vf-stage"></div>
+          <div class="vf-bar" aria-hidden="true"><i></i></div>
+          <p>The flow is simulated for $T$ steps and differentiated through all of them, so every update pays for the whole trajectory.</p>
+          <ul class="vf-badges"><li class="good">unbiased</li><li class="bad"><i>O</i>(<i>T</i>) calls</li><li class="bad"><i>O</i>(<i>T</i>) memory</li></ul>
+        </article>
+        <article class="vf-panel ours" data-kind="wtf" data-aria="WTF: two flow-map jumps reach x_1 from x_t through an intermediate time tau, and one Jacobian backprop returns the value gradient.">
+          <div class="vf-head"><h4>WTF (ours)</h4><span class="vf-calls">forward calls <b>0</b></span></div>
+          <div class="vf-stage"></div>
+          <div class="vf-bar" aria-hidden="true"><i></i></div>
+          <p>Two flow-map jumps reach $x_1$ from $x_t$, and one Jacobian backprop returns the value gradient.</p>
+          <ul class="vf-badges"><li class="good">unbiased</li><li class="good"><i>O</i>(1)</li><li class="good">no critic</li></ul>
+        </article>
+      </div>
+
+      <div class="prose">
+        <p>
+          Writing the remaining control cost as an average over a uniformly sampled time $\tau$ gives an unbiased single-sample estimate of the value, with both states produced by flow-map jumps.
+        </p>
+      </div>
+      <div class="keybox narrow">
+        $$\widehat V(t,x)=\lambda\, r(x_1)-\frac{1-t}{2}\,\big\|\bar u_\tau(x_\tau)\big\|^2,\qquad
+          \tau\sim\mathrm{U}[t,1],\quad x_\tau=X^{\bar u}_{t,\tau}(x),\quad x_1=X^{\bar u}_{\tau,1}(x_\tau)$$
+      </div>
+      <div class="prose"><p>The flow map gives $x_1$ without simulating the trajectory, so the only Monte Carlo approximation is the scalar time integral.</p></div>
+
+      <h3 class="sub-heading">The WTF objective</h3>
+      <div class="keybox narrow accent">
+        $$\mathcal{L}_{\mathrm{WTF}}(\hat w)=\mathbb{E}\Big[\big\|\hat w_{t,t}(\bar x_t)-b_t(\bar x_t)-\nabla_x\widehat V(t,\bar x_t)\big\|^2\Big]
+          +\beta\,\mathcal{L}_{\mathrm{dist}}(\hat w),\qquad \bar w=\mathrm{sg}(\hat w)$$
+        <p class="framing-note">Value-gradient regression on the diagonal, flow map self-distillation off the diagonal.
+          Distillation keeps the output a flow map, and that flow map keeps supplying amortized on-policy rollouts for
+          the next value estimate.</p>
+      </div>
+
+      <div class="algobox">
+        <p class="algo-tag">One training step of WTF</p>
+        <ol>
+          <li>Sample $x_0\sim\rho_0$, $t\sim\mathrm{U}[0,1]$, $\tau\sim\mathrm{U}[t,1]$.</li>
+          <li>Jump with the frozen flow map to $\bar x_t=X^{\bar w}_{0,t}(x_0)$, $\bar x_\tau=X^{\bar w}_{t,\tau}(\bar x_t)$ and $\bar x_1=X^{\bar w}_{\tau,1}(\bar x_\tau)$.</li>
+          <li>Estimate the value $\widehat V$ and backpropagate once to get $\widehat g=\nabla_{\bar x_t}\widehat V$.</li>
+          <li>Regress $\hat w_{t,t}(\bar x_t)$ onto $b_t(\bar x_t)+\widehat g$ and add the self-distillation loss.</li>
+        </ol>
+        <p class="algo-note">At the population level every fixed point is the optimal control, and the output remains a flow map.</p>
+      </div>
     </section>
 
     <!-- ============================ RESULTS ============================ -->
     <section class="section" id="results">
       <div class="section-heading">
         <span class="kicker">Results</span>
-        <h2>Higher reward, at a fraction of the compute</h2>
+        <h2>Reward and training compute</h2>
         <p>
-          ImageNet-256 with DMF-XL/2 and text-to-image with TiM-T2I, both fine-tuned against HPSv2. One fine-tuned flow
-          map is evaluated across every inference budget, with no post-hoc distillation.
+          We fine-tune DMF-XL/2 on ImageNet-256 and TiM-T2I for text-to-image, both against HPSv2, using the Euclidean reward gradient that drops the flow-map Jacobian from the reward term. WTF achieves higher reward with comparable or higher diversity than the baselines, and the same fine-tuned flow map remains effective at few steps without post-hoc distillation.
         </p>
       </div>
 
-      <div class="result-band" aria-label="Headline results">
-        <article><p>Compute to Flow-GRPO's peak</p><strong>280× less</strong><span>zeroth-order baseline</span></article>
-        <article><p>Compute to Adjoint Matching's peak</p><strong>47× less</strong><span>first-order baseline</span></article>
-        <article><p>Text-to-image HPSv2 · 4 NFE</p><strong>0.401</strong><span>vs. 0.357 Adjoint Matching at 50 NFE</span></article>
-        <article><p>ImageNet HPSv2 · 1 NFE</p><strong>0.319</strong><span>vs. 0.307 for VFM, also 1 NFE</span></article>
-      </div>
-
-      <figure class="figure-clean">
-        <img class="on-white" src="assets/img/compute_curves.png" width="1246" height="753" style="max-width:min(620px, 100%)"
-          alt="HPSv2 against cumulative GPU-hours for WTF, Adjoint Matching and Flow-GRPO. WTF rises almost immediately and reaches each baseline's peak reward with 47 times and 280 times less compute.">
+      <figure class="cfig" id="computefig" data-src="assets/data/compute_curves.json">
+        <div class="cf-stage"></div>
         <figcaption>
-          <strong>Reward against cumulative training compute.</strong> HPSv2 versus GPU-hours at 50 NFE, all methods
-          fine-tuned from the same flow map. WTF reaches the peak rewards of Adjoint Matching and Flow-GRPO with
-          $47\times$ and $280\times$ less compute. Shading is $\pm1$ standard error.
+          <strong>Reward against training compute.</strong> Text-to-image HPSv2 at 50 NFE, every method fine-tuned from
+          the same flow map on one 8×H100 node. Each span runs from where WTF first reaches a baseline's peak reward to
+          where that baseline does. Shading is ±1 standard error.
         </figcaption>
       </figure>
 
@@ -339,68 +397,32 @@
         <table class="comparison-table" id="tbl-imagenet"></table>
       </div>
       <p class="table-note" id="table-note"></p>
-
-      <h3 class="sub-heading">Transport reaches where reweighting cannot</h3>
-      <p class="sub-lede">The 1-D comparison behind the Tilt Lab, as reported in the paper.</p>
-      <figure class="figure-clean">
-        <img class="on-white" src="assets/img/synth_panels.png" width="2322" height="749"
-          alt="Terminal densities of the base law, the KL tilt and WTF for reward locations K = 2, 3.5 and 5. As the reward moves away, the KL tilt can only reweight existing mass while WTF transports mass toward the reward.">
-        <figcaption>
-          <strong>WTF vs. KL regularization in one dimension.</strong> Each panel places the reward at a different
-          distance $K$ from the base mean. As the reward moves into lower-density regions, KL tilting reweights the
-          existing mass, whereas WTF transports mass toward the reward.
-        </figcaption>
-      </figure>
-      <div class="gallery-grid">
-        <figure class="figure-clean">
-          <img class="on-white" src="assets/img/synth_kcurve.png" width="1069" height="731"
-            alt="Expected reward against reward location K at fixed reward scale: the gap between WTF and the KL tilt widens as K grows.">
-          <figcaption>Expected reward vs. reward location $K$: the gap widens as the reward moves outward.</figcaption>
-        </figure>
-        <figure class="figure-clean">
-          <img class="on-white" src="assets/img/synth_lamsweep.png" width="1051" height="731"
-            alt="Expected reward against reward scale lambda at fixed reward location.">
-          <figcaption>Expected reward vs. reward scale $\lambda$ at a fixed reward location.</figcaption>
-        </figure>
-      </div>
     </section>
 
     <!-- ============================ GALLERY ============================ -->
     <section class="section" id="gallery">
       <div class="section-heading">
         <span class="kicker">Gallery</span>
-        <h2>One flow map, every inference budget</h2>
+        <h2>Qualitative examples</h2>
         <p>
-          Each column is one prompt; each row an inference budget, with the pre-trained model on top. Every WTF row in a
-          column shares the same initial noise, so you are watching one sample refine as the budget grows.
+          The text-to-image rows are the prompts from the paper appendix, and the ImageNet-256 rows show eighteen classes from the paper checkpoint. Within a row every WTF panel starts from the same initial noise, so the row follows a single sample as the budget grows.
         </p>
       </div>
 
-      <figure class="figure-clean">
-        <img src="assets/img/t2i_samples_1.jpg" width="2000" height="1493" loading="lazy"
-          alt="Text-to-image samples across inference budgets, first set: base model on top, then WTF at increasing numbers of steps.">
-        <figcaption><strong>Text-to-image, first set.</strong> Base model (top) and WTF across inference budgets.</figcaption>
-      </figure>
-      <figure class="figure-clean">
-        <img src="assets/img/t2i_samples_2.jpg" width="2000" height="1493" loading="lazy"
-          alt="Text-to-image samples across inference budgets, second set.">
-        <figcaption><strong>Text-to-image, second set.</strong> Prompts for both sets are listed in Appendix I.2 of the paper.</figcaption>
-      </figure>
-      <figure class="figure-clean">
-        <img src="assets/img/imagenet_qual.jpg" width="2000" height="1103" loading="lazy"
-          alt="ImageNet-256 samples at 250 NFE from the base model, Adjoint Matching and WTF with the initial latent fixed down each column.">
-        <figcaption>
-          <strong>ImageNet-256.</strong> Samples at 250 NFE from the base model, Adjoint Matching and WTF, with the
-          initial latent fixed down each column. Adjoint Matching stays close to the base sample; WTF changes
-          composition and color while keeping the class.
-        </figcaption>
-      </figure>
-
-      <p class="more-results">
-        For the theory (the per-sample decomposition, the zero-noise limit connecting WTF to stochastic optimal
-        control, fixed-point optimality), plus implementation details, the exact vs. Euclidean reward gradient
-        ablation and the full compute comparison, see <a href="https://arxiv.org/abs/2609.27033" target="_blank" rel="noopener">the paper</a>.
-      </p>
+      <div class="pill-tabs qual-tabs" role="tablist" id="qual-tabs">
+        <button type="button" class="pill-tab active" data-qual="t2i">Text-to-image</button>
+        <button type="button" class="pill-tab" data-qual="imagenet">ImageNet-256</button>
+      </div>
+      <div class="qual" id="qual">
+        <div class="qual-viewport">
+          <button class="qual-nav prev" type="button" aria-label="Previous example"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+          <button class="qual-nav next" type="button" aria-label="Next example"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
+          <div class="qual-labels" id="qual-labels"></div>
+          <img loading="lazy" decoding="async" class="qual-img" id="qual-img" alt="">
+        </div>
+        <p class="qual-prompt" id="qual-prompt"></p>
+        <div class="qual-foot"><div class="qual-dots" id="qual-dots"></div><span class="qual-counter" id="qual-counter"></span></div>
+      </div>
     </section>
 
     <!-- ============================ CITATION ============================ -->
@@ -423,18 +445,22 @@
 
   <footer class="footer">
     <span>University of Oxford · Carnegie Mellon University · NeurIPS 2026</span>
-    <span class="footer-tagline">Transport, don't reweight.</span>
+    
   </footer>
 
   <div class="theme-picker" id="theme-picker" aria-label="Design options">
     <p>Design option</p>
+    <button type="button" data-theme-set="carbon">Carbon</button>
     <button type="button" data-theme-set="violet">Violet</button>
     <button type="button" data-theme-set="ember">Ember</button>
     <button type="button" data-theme-set="night">Night</button>
   </div>
 
-  <script src="assets/js/tilt-lab.js"></script>
-  <script src="assets/js/main.js"></script>
+  <script src="assets/js/tilt-lab.js?v=30"></script>
+  <script src="assets/js/main.js?v=30"></script>
+  <script src="assets/js/computefig.js?v=30"></script>
+  <script src="assets/js/valuefig.js?v=30"></script>
+  <script src="assets/js/qual.js?v=30"></script>
 </body>
 
 </html>

@@ -120,7 +120,27 @@
     const outBase = root.querySelector('#er-base'), outKl = root.querySelector('#er-kl'), outWtf = root.querySelector('#er-wtf');
     const gainKl = root.querySelector('#gain-kl'), gainWtf = root.querySelector('#gain-wtf');
     const XL = -3.6, XR = 9.6;
-    let raf = 0;
+    let raf = 0, envTimer = 0;
+    const yEnvelope = new Map();
+    function peak(g, kl, wt) {
+      let m = 0.45;
+      for (let i = 0; i < g.length; i++) {
+        if (g[i] < XL || g[i] > XR) continue;
+        if (kl.dens[i] > m) m = kl.dens[i];
+        if (wt.dens[i] > m) m = wt.dens[i];
+      }
+      return m;
+    }
+    function computeEnvelope(lam) {
+      if (yEnvelope.has(lam)) return;
+      const kMin = +kIn.min, kMax = +kIn.max;
+      let m = 0;
+      for (let j = 0; j <= 26; j++) {
+        const { g, kl, wt } = solve(kMin + (kMax - kMin) * j / 26, lam);
+        m = Math.max(m, peak(g, kl, wt));
+      }
+      yEnvelope.set(lam, Math.min(Math.ceil(m * 1.04 * 10) / 10, 3.2));   // round up to 0.1
+    }
 
     function draw() {
       raf = 0;
@@ -138,14 +158,14 @@
       const padL = 46, padR = 16, padT = 14, padB = 34;
       const pw = Wd - padL - padR, ph = Hd - padT - padB;
 
-      // y-range from the visible densities
-      let ymax = 0.45;
-      for (let i = 0; i < g.length; i++) {
-        if (g[i] < XL || g[i] > XR) continue;
-        if (kl.dens[i] > ymax) ymax = kl.dens[i];
-        if (wt.dens[i] > ymax) ymax = wt.dens[i];
+      // y-range: fixed per lambda (the envelope over every K on the slider), so the axis and grid
+      // stay still while K moves; until that envelope is computed, fall back to this frame's peak.
+      let ymax = yEnvelope.get(lam);
+      if (ymax === undefined) {
+        ymax = Math.min(peak(g, kl, wt) * 1.08, 3.2);
+        clearTimeout(envTimer);
+        envTimer = setTimeout(() => { computeEnvelope(lam); schedule(); }, 180);
       }
-      ymax = Math.min(ymax * 1.08, 3.2);
       const X = x => padL + (x - XL) / (XR - XL) * pw;
       const Y = y => padT + ph - (y / ymax) * ph;
 
