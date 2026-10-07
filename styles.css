@@ -1,10 +1,7 @@
 /* ============================================================
    WTF?!: Wasserstein-Tilted Flow Maps · project page
    Same design system as the EPS page (centered academic layout),
-   with three palettes selectable through [data-theme]:
-     violet : default; matches the paper's lavender figures
-     ember  : warm orange accent, light
-     night  : dark mode
+   with the violet palette, which matches the paper's lavender figures.
    ============================================================ */
 :root {
   --sans: 'Inter', system-ui, -apple-system, sans-serif;
@@ -58,128 +55,7 @@
   --c-rew: #5d9c8a;          /* reward = green, as in the paper figures */
 }
 
-/* ---------- palette: ember ---------- */
-[data-theme="ember"] {
-  --ink: #1c1410;
-  --ink-soft: #5b4d45;
-  --ink-faint: #9a8b82;
-  --paper: #fffbf7;
-  --panel: #ffffff;
-  --line: #f1e7de;
-  --line-strong: #e4d4c6;
 
-  --accent: #c2410c;
-  --accent-2: #ea580c;
-  --hot: #c2410c;
-  --num-color: #c2410c;
-  --kicker-color: #c2410c;
-  --display-font: var(--serif);
-  --display-weight: 600;
-
-  --card-bg: #ffffff;
-  --card-border: var(--line);
-  --ours-bg: #fff1e6;
-  --ours-soft: #fff7f0;
-
-  --hero-g1: rgba(234, 88, 12, .14);
-  --hero-g2: rgba(29, 78, 216, .09);
-  --hero-g3: rgba(202, 138, 4, .08);
-  --hero-grid-opacity: .5;
-
-  --code-bg: #1c1410;
-  --code-ink: #f1e4d8;
-
-  --c-base: #c4b6ac;
-  --c-kl: #2f6db5;
-  --c-wtf: #ea580c;
-  --c-rew: #7aa489;
-}
-
-/* ---------- palette: night ---------- */
-[data-theme="night"] {
-  --ink: #ecebf6;
-  --ink-soft: #b4b1cc;
-  --ink-faint: #7f7c99;
-  --paper: #0d0b1a;
-  --panel: #161329;
-  --line: #262241;
-  --line-strong: #353058;
-
-  --accent: #b39dff;
-  --accent-2: #8f76ff;
-  --hot: #ff9a4d;
-  --num-color: #c4b3ff;
-  --kicker-color: #b39dff;
-  --display-font: var(--serif);
-  --display-weight: 600;
-
-  --card-bg: #161329;
-  --card-border: var(--line);
-  --ours-bg: #241d47;
-  --ours-soft: #1c173a;
-
-  --hero-g1: rgba(143, 118, 255, .22);
-  --hero-g2: rgba(255, 154, 77, .12);
-  --hero-g3: rgba(80, 180, 150, .10);
-  --hero-grid-opacity: .35;
-
-  --code-bg: #08070f;
-  --code-ink: #dcd8f0;
-
-  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px -16px rgba(0,0,0,.6);
-  --shadow-lg: 0 30px 70px -36px rgba(0,0,0,.8);
-
-  --c-base: #6f6a8e;
-  --c-kl: #7ea6ff;
-  --c-wtf: #ff9a4d;
-  --c-rew: #6cc3a6;
-}
-/* ---------- palette: carbon (dark, default) ----------
-   Warm-neutral greys (OKLCH hue 70, chroma <= 0.006: no violet cast) and ONE accent hue.
-   Orange means "WTF / ours" everywhere (curves, best cells, our rows, the mark), matching the
-   launch video, so it is the only saturated colour on the page. Values are OKLCH-derived;
-   every text colour clears WCAG AA on --paper and --panel (ink 15.9:1, orange 8.0:1, faint 5.3:1). */
-[data-theme="carbon"] {
-  --ink: #ece9e5;            /* oklch(.935 .006 80) */
-  --ink-soft: #b9b7b3;       /* oklch(.78 .006 80) */
-  --ink-faint: #888682;      /* oklch(.62 .006 80) */
-  --paper: #0f0e0c;          /* oklch(.165 .004 70) */
-  --panel: #191715;          /* oklch(.205 .005 70) */
-  --line: #292725;           /* oklch(.275 .005 70) */
-  --line-strong: #3b3936;    /* oklch(.345 .006 70) */
-
-  --accent: #f48d3c;         /* oklch(.74 .155 55) */
-  --accent-2: #f48d3c;
-  --accent-ink: #0f0e0c;
-  --hot: #f48d3c;
-  --num-color: #f48d3c;
-  --kicker-color: var(--ink-faint);
-  --display-font: var(--serif);
-  --display-weight: 600;
-
-  --card-bg: #191715;
-  --card-border: var(--line);
-  --ours-bg: #2a1d15;        /* oklch(.245 .025 55) */
-  --ours-soft: #1e1814;      /* oklch(.215 .012 55) */
-
-  --hero-g1: transparent;
-  --hero-g2: transparent;
-  --hero-g3: transparent;
-  --hero-grid-opacity: .22;
-
-  --code-bg: #080706;
-  --code-ink: #dcd8d2;
-
-  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 12px 32px -16px rgba(0,0,0,.6);
-  --shadow-lg: 0 30px 70px -36px rgba(0,0,0,.8);
-
-  --c-base: #7d7a75;         /* oklch(.58 .008 80) */
-  --c-kl: #70a9e4;           /* oklch(.72 .105 250) */
-  --c-wtf: #f48d3c;
-  --c-rew: #74c0a0;          /* oklch(.75 .09 165) */
-}
-/* paper figures are drawn on white; keep them legible in dark mode */
-[data-theme="night"] .on-white, [data-theme="carbon"] .on-white { background: #fff; border-radius: var(--radius-sm); padding: .6rem; }
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 76px; }
@@ -531,26 +407,6 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
 .lightbox img { max-width: 96vw; max-height: 94vh; border-radius: 8px; background: #fff; box-shadow: 0 40px 90px -30px rgba(0,0,0,.7); }
 .lightbox-hint { position: fixed; bottom: 1.2rem; left: 0; right: 0; text-align: center; color: rgba(255,255,255,.7); font-size: .8rem; }
 
-/* ---------------- design-option picker (review only; shown with ?options) ---------------- */
-.theme-picker {
-  position: fixed; right: 1rem; bottom: 1rem; z-index: 90; display: none;
-  background: var(--panel); border: 1px solid var(--line-strong); border-radius: 14px;
-  box-shadow: var(--shadow-lg); padding: .7rem .8rem; font-size: .8rem;
-}
-.theme-picker.show { display: block; }
-.theme-picker p { margin: 0 0 .45rem; font-weight: 700; color: var(--ink-faint); text-transform: uppercase; letter-spacing: .08em; font-size: .68rem; }
-.theme-picker button {
-  font: inherit; font-weight: 600; margin: 0 .2rem 0 0; padding: .35rem .7rem; border-radius: 999px; cursor: pointer;
-  border: 1px solid var(--line-strong); background: var(--paper); color: var(--ink-soft);
-}
-.theme-picker button.on { background: var(--accent); color: var(--accent-ink, #fff); border-color: var(--accent); }
-
-/* carbon: orange is reserved for WTF itself; venue line, badge and author rules stay neutral */
-[data-theme="carbon"] .hero-venue { color: var(--ink-soft); }
-[data-theme="carbon"] .venue-badge { color: var(--ink); background: transparent; border-color: var(--line-strong); }
-[data-theme="carbon"] .authors a { border-bottom-color: var(--line-strong); }
-[data-theme="carbon"] .authors a:hover { color: var(--ink); border-color: var(--ink-soft); }
-
 /* ---------------- animated figure (FMRG pattern: plays once when in view, replay) ---------------- */
 /* The tilt animation is shown at slide scale (about 87% of the screen width, as on the Keynote slide)
    rather than squeezed into the 1000px text column; the caption stays at reading width. */
@@ -855,3 +711,61 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
 .comparison-table td.best { font-weight: 700; }
 .qual { overflow: visible; } .qual-viewport { overflow: visible; }
 .qual-nav.prev { left: -1.15rem; } .qual-nav.next { right: -1.15rem; }
+
+/* ---------------- gallery reel (auto-advancing, neighbours peek at the edges) ---------------- */
+.reel { position: relative; width: min(1440px, 96vw); left: 50%; transform: translateX(-50%); margin-top: .4rem; }
+.reel-window { overflow: hidden; padding: .3rem 0; }
+.reel-track { display: flex; column-gap: 32px; transition: transform .8s cubic-bezier(.4, 0, .2, 1); will-change: transform; }
+.reel-slide { flex: 0 0 min(1040px, 78%); margin: 0; opacity: .32; transform: scale(.94); cursor: pointer;
+  transition: opacity .6s ease, transform .8s cubic-bezier(.4, 0, .2, 1); }
+.reel-slide.active { opacity: 1; transform: none; cursor: default; }
+.reel-slide .qual-labels { padding: 0 0 .45rem; }
+.reel-slide img { display: block; width: 100%; height: auto; border-radius: 6px; }
+.reel-slide .qual-prompt { padding: .7rem 1rem 0; }
+.reel-nav { position: absolute; top: 46%; z-index: 3; width: 3rem; height: 3rem; border-radius: 50%; border: 1px solid var(--line-strong);
+  background: var(--panel); color: var(--ink); display: flex; align-items: center; justify-content: center; cursor: pointer;
+  box-shadow: 0 6px 18px -8px rgba(18, 15, 36, .35); transition: color .15s, border-color .15s; }
+.reel-nav:hover { color: var(--accent); border-color: var(--accent); }
+.reel-nav.prev { left: max(.5rem, calc(11% - 1.5rem)); } .reel-nav.next { right: max(.5rem, calc(11% - 1.5rem)); }
+.reel-nav svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2.4; fill: none; }
+.reel-foot { display: flex; align-items: center; justify-content: center; gap: .8rem; padding: .9rem 0 0; }
+.reel-counter { font: 600 .74rem var(--mono); color: var(--ink-faint); min-width: 3.4rem; text-align: right; }
+.reel-progress { width: 140px; height: 3px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.reel-progress i { display: block; height: 100%; width: 0; background: var(--accent); }
+@media (max-width: 720px) { .reel-slide { flex-basis: 88%; } .reel-nav { width: 2.5rem; height: 2.5rem; } }
+.reel-nav.prev { left: max(.3rem, calc((100% - min(1040px, 78%)) / 2 - 3.6rem)); }
+.reel-nav.next { right: max(.3rem, calc((100% - min(1040px, 78%)) / 2 - 3.6rem)); }
+
+.reel-progress { transition: opacity .3s ease; }
+.reel-progress.off { opacity: 0; }
+
+/* the paper's central question, set off once as in the paper */
+.prose .question { max-width: 640px; margin: 1.6rem auto; padding: 0; text-align: center; border: 0;
+  font-family: var(--serif); font-style: italic; font-size: 1.12rem; line-height: 1.5; color: var(--ink); }
+
+/* core contributions: a numbered list with bold lead-ins (no cards) */
+.contrib { max-width: 760px; margin: 0 auto; padding: 0; list-style: none; counter-reset: contrib; display: grid; gap: 1.1rem; text-align: left; }
+.contrib li { counter-increment: contrib; position: relative; padding-left: 2.6rem; font-size: 1rem; line-height: 1.65; color: var(--ink-soft); }
+.contrib li::before { content: counter(contrib, decimal-leading-zero); position: absolute; left: 0; top: .1rem;
+  font: 600 .82rem var(--mono); color: var(--accent); }
+.contrib li strong { color: var(--ink); font-weight: 600; }
+
+/* abstract emphasis in the accent colour; table numbers in regular weight (best values keep the accent colour) */
+.comparison-table tbody td:not(:first-child), .comparison-table .ours-row td:not(:first-child), .comparison-table td.best { font-weight: 400; }
+
+/* ---------------- motivation: lead, pipeline comparison, three points, close ---------------- */
+.mot-lead { max-width: 760px; margin: 0 auto 1.8rem; font-size: 1.08rem; line-height: 1.65; color: var(--ink); text-align: center; }
+.pipes { max-width: 980px; margin: 0 auto; display: grid; gap: .8rem; }
+.pipe { display: grid; grid-template-columns: 9rem 1fr; align-items: center; gap: 1rem; }
+.pipe-name { font: 700 .74rem var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-faint); text-align: right; }
+.pipe.ours .pipe-name { color: var(--accent); }
+.pipe-steps { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; }
+.pipe-steps span { font: 500 .88rem var(--sans); padding: .42rem .8rem; border-radius: 999px; border: 1px solid var(--line-strong); color: var(--ink-soft); background: var(--panel); }
+.pipe.ours .pipe-steps span { border-color: color-mix(in srgb, var(--accent) 40%, transparent); color: var(--accent); background: var(--ours-soft); }
+.pipe-steps i { font-style: normal; color: var(--ink-faint); }
+.mot-points { max-width: 1000px; margin: 2.2rem auto 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; text-align: left; }
+.mot-points > div { border-top: 2px solid var(--line-strong); padding-top: .8rem; }
+.mot-points h3 { margin: 0 0 .4rem; font-family: var(--display-font); font-weight: var(--display-weight); font-size: 1.05rem; color: var(--ink); }
+.mot-points p { margin: 0; font-size: .93rem; line-height: 1.6; color: var(--ink-soft); }
+.mot-close { max-width: 760px; margin: 2rem auto 0; font-size: 1rem; line-height: 1.65; color: var(--ink); text-align: center; }
+@media (max-width: 860px) { .mot-points { grid-template-columns: 1fr; gap: 1.2rem; } .pipe { grid-template-columns: 1fr; } .pipe-name { text-align: left; } }

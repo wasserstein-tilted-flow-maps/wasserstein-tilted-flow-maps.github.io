@@ -22,14 +22,8 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=30">
+  <link rel="stylesheet" href="styles.css?v=48">
   <script>
-    // design option: ?theme=violet|carbon|ember|night (default violet). Review picker: ?options
-    (function () {
-      const q = new URLSearchParams(location.search);
-      const t = q.get('theme');
-      if (t) document.documentElement.setAttribute('data-theme', t);
-    })();
     window.MathJax = {
       tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
       chtml: { scale: 1.0 }
@@ -43,8 +37,10 @@
     <a class="nav-brand" href="#top">WTF?!</a>
     <div class="nav-links">
       <a href="#abstract">Abstract</a>
+      <a href="#motivation">Motivation</a>
+      <a href="#contributions">Contributions</a>
       <a href="#method">Method</a>
-      <a href="#lab">Interactive</a>
+      
       <a href="#algorithm">Algorithm</a>
       <a href="#results">Results</a>
       <a href="#gallery">Gallery</a>
@@ -128,7 +124,7 @@
         </div>
         </div>
         <figcaption>
-          <strong>Reward-aligned generation at few steps.</strong> Flow maps fine-tuned with WTF for HPSv2. At 4 steps (text-to-image) and 1 step (ImageNet-256), WTF matches the quality of its own 50-step samples. The base model is shown at 50 steps.
+          <strong>Reward-aligned generation at few steps.</strong> Flow maps fine-tuned with WTF using HPSv2 as the reward. At 4 steps for text-to-image and 1 step for ImageNet-256, WTF produces samples of comparable quality to its own 50-step samples. The base model is evaluated at 50 steps.
         </figcaption>
       </figure>
     </div>
@@ -164,13 +160,64 @@
           post-training, and that the dominant KL-regularized formulation is only one of many choices worth revisiting.
         </p>
       </div>
+    </section>
 
-      <div class="highlights">
-        
-        <div><strong>$O(1)$</strong><span>flow map calls per value estimate</span></div>
-        <div><strong>1 to 250</strong><span>inference steps from one fine-tuned flow map</span></div>
-        <div><strong>No critic</strong><span>unbiased Monte Carlo value estimator</span></div>
+    <!-- ============================ MOTIVATION ============================ -->
+    <section class="section" id="motivation">
+      <div class="section-heading">
+        <span class="kicker">Motivation</span>
+        <h2>Reward fine-tuning of flows</h2>
+        <p>
+          Reward fine-tuning updates a pre-trained flow model so that its samples score higher under a reward $r$, such
+          as a human preference score, while staying close to the pre-trained model. Rewards are only defined for
+          complete samples, so each update requires rollouts from the current model.
+        </p>
       </div>
+
+      <div class="framing">
+        <p class="framing-label">The standard formulation, KL reward tilting</p>
+        $$\tilde\rho_1=\arg\max_{\nu}\ \lambda\,\mathbb{E}_{\nu}[r]-\mathrm{KL}(\nu\,\|\,\rho_1),\qquad \tilde\rho_1(x)\propto e^{\lambda r(x)}\,\rho_1(x)$$
+      </div>
+
+      <div class="problems">
+        <article>
+          <span class="pnum">01</span>
+          <h3>It reweights the base model</h3>
+          <p>The target multiplies the base density by $e^{\lambda r}$. Samples with high reward become more likely, and
+            two samples with equal reward keep the same relative density.</p>
+        </article>
+        <article>
+          <span class="pnum">02</span>
+          <h3>It is trained through a diffusion</h3>
+          <p>The pathwise KL is tractable for diffusions, so existing methods convert the flow into a diffusion, fine-tune it with many-step stochastic rollouts, and convert it back. These procedures cannot exploit the accelerated transitions of flow maps, which jump between any two times of the flow in one network evaluation.</p>
+        </article>
+      </div>
+
+      <blockquote class="question">Is there an efficient framework for direct end-to-end fine-tuning of a deterministic flow map?</blockquote>
+      <p class="mot-close">
+        WTF replaces the KL term with a cost that measures how much the pre-trained flow must be steered. Fine-tuning then becomes a deterministic control problem, which a pre-trained flow map lets us solve without simulating rollouts. The result is <strong>simulation-free reinforcement learning</strong> for flows.
+      </p>
+    </section>
+
+    <!-- ============================ CONTRIBUTIONS ============================ -->
+    <section class="section" id="contributions">
+      <div class="section-heading">
+        <span class="kicker">Contributions</span>
+        <h2>Wasserstein-Tilted Flow Maps</h2>
+      </div>
+      <ol class="contrib">
+        <li><strong>Transport regularization.</strong> We define a transport cost from the pre-trained drift and use it
+          to regularize reward maximization. The resulting objective decomposes into a reward-cost optimization for each
+          source sample.</li>
+        <li><strong>Deterministic optimal control.</strong> We prove that the regularized objective is equivalent to
+          controlling the deterministic flow with a terminal reward and a quadratic control cost.</li>
+        <li><strong>Simulation-free fine-tuning.</strong> We construct an unbiased, critic-free Monte Carlo value
+          estimator using $O(1)$ flow-map evaluations. Value-gradient regression and self-distillation jointly update
+          the flow map.</li>
+        <li><strong>Image generation results.</strong> WTF achieves higher reward with comparable or higher diversity on
+          ImageNet-256 and text-to-image. On text-to-image, it reaches the peak rewards of Flow-GRPO and Adjoint Matching
+          with up to $280\times$ and $47\times$ less training compute, respectively.</li>
+      </ol>
     </section>
 
     <!-- ============================ METHOD ============================ -->
@@ -182,23 +229,17 @@
 
       <div class="prose">
         <p>
-          Reward fine-tuning seeks a terminal distribution that increases the expected reward while staying close to
-          the pre-trained model,
+          Reward fine-tuning maximizes expected reward over a terminal distribution $\nu$. The regularizer $\mathcal R$ penalizes departure from the pre-trained model.
         </p>
         $$\tilde\rho_1=\arg\max_{\nu}\ \lambda\,\mathbb{E}_{x\sim\nu}[r(x)]-\mathcal{R}(\nu).$$
         <p>
-          The usual choice $\mathcal{R}(\nu)=\mathrm{KL}(\nu\,\|\,\rho_1)$ gives the reward-tilted distribution
-          $\tilde\rho_1\propto e^{\lambda r}\rho_1$, which reweights the base distribution. Its pathwise form is
-          tractable for diffusions, so existing methods fine-tune a diffusion surrogate of the flow with many-step
-          stochastic rollouts. We define $\mathcal{R}$ through the deterministic flow itself. The cost $c_b$ is the
-          least residual control energy needed to steer the pre-trained drift $b_t$ from $x$ to $y$, and the
-          regularizer is the corresponding transport problem from the prior $\rho_0$.
+          The choice $\mathcal{R}(\nu)=\mathrm{KL}(\nu\,\|\,\rho_1)$ recovers the reward tilt. We use a transport regularizer from the prior $\rho_0$ to $\nu$, with a cost defined by the pre-trained drift $b_t$. The cost $c_b(x,y)$ is the least steering effort needed to move from $x$ to $y$ while following $b_t$.
         </p>
       </div>
       <div class="keybox narrow">
         $$\mathcal{T}_b(\rho_0,\nu)=\inf_{\pi\in\Pi(\rho_0,\nu)}\int c_b(x,y)\,\pi(dx\,dy),\qquad
           c_b(x,y)=\inf_{\omega_0=x,\ \omega_1=y}\ \frac12\int_0^1\big\|\dot\omega_t-b_t(\omega_t)\big\|^2dt$$
-        <p class="framing-note">With $b\equiv 0$ the regularizer reduces to $\tfrac12 W_2^2(\rho_0,\nu)$.</p>
+        <p class="framing-note">With $b\equiv 0$, the regularizer reduces to $\tfrac12 W_2^2(\rho_0,\nu)$.</p>
       </div>
 
       <figure class="figure-hero figure-anim">
@@ -209,21 +250,19 @@
           </video>
         </div>
         <figcaption>
-          <strong>Wasserstein tilt and reward tilt.</strong> As the reward weight $\lambda$ grows, the Wasserstein
-          tilt transports each base sample locally toward higher reward, with the displacement regularized by
-          $\mathcal{T}_b$. The reward tilt multiplies the base density by $e^{\lambda r}$, which reweights the existing modes.
+          Wasserstein tilting transports samples toward higher reward under the drift-induced cost $\mathcal T_b$. KL
+          tilting reweights the base density by $e^{\lambda r}$, followed by normalization.
         </figcaption>
       </figure>
 
       <div class="prose">
         <p>
-          By Kantorovich duality, the problem decouples over source samples,
+          The problem splits into a separate choice for each starting sample.
         </p>
         $$\sup_{\nu}\Big\{\lambda\,\mathbb{E}_{\nu}[r]-\mathcal{T}_b(\rho_0,\nu)\Big\}
-          =\mathbb{E}_{x\sim\rho_0}\Big[\sup_{y}\big\{\lambda\, r(y)-c_b(x,y)\big\}\Big],$$
+          =\mathbb{E}_{x\sim\rho_0}\Big[\sup_{y}\big\{\lambda\, r(y)-c_b(x,y)\big\}\Big].$$
         <p>
-          so each source sample moves to the endpoint that maximizes $\lambda r(y)-c_b(x,y)$. A reward tilt preserves
-          the density ratio of any two points with equal reward, while transport can move mass between them.
+          Each sample moves to the endpoint with the best tradeoff between reward and steering cost. This transport can change the relative density of points with equal reward, which KL tilting preserves.
         </p>
       </div>
     </section>
@@ -231,10 +270,10 @@
     <!-- ============================ INTERACTIVE 1-D DEMO ============================ -->
     <section class="section" id="lab">
       <div class="section-heading">
-        <span class="kicker">Interactive</span>
-        <h2>WTF and KL tilting in one dimension</h2>
+        
+        <h2>Wasserstein vs. KL tilting</h2>
         <p>
-          Both population optima are computed without sampling, for a standard Gaussian base and a Gaussian reward bump of width $2.25$ centered at $K$. As the reward moves into lower-density regions of the base, the KL tilt can only reweight the existing mass, while the Wasserstein tilt transports part of the mass toward the reward.
+          For a standard Gaussian base and a Gaussian reward bump, both optimal distributions can be computed directly, without training or sampling. The reward has width $2.25$ and is centered at $K$. At the paper's fixed reward scale, WTF achieves higher expected reward, with the gap increasing as the reward moves farther from the base mean over the tested range.
         </p>
       </div>
 
@@ -272,8 +311,7 @@
         </div>
       </div>
       <p class="lab-note">
-        The curves are computed in your browser from the paper's closed forms, with the KL tilt by quadrature and the
-        WTF optimum by the per-sample maximization above and its exact pushforward. Nothing is sampled. At $K=4.75$ and $\lambda=7$ the paper reports an expected reward of $0.142$ for the base, $0.367$ for the KL tilt and $0.617$ for WTF.
+        Both curves are computed in your browser with the procedure used in the paper. Nothing is sampled.
       </p>
 
     </section>
@@ -282,9 +320,9 @@
     <section class="section" id="algorithm">
       <div class="section-heading">
         <span class="kicker">Algorithm</span>
-        <h2>Solving the optimal control problem</h2>
+        <h2>Fine-tuning by policy iteration</h2>
         <p>
-          The per-sample decomposition characterizes the optimum but does not give a training algorithm. The problem is equivalent to a deterministic optimal control problem, which we solve by policy iteration using a pre-trained flow map.
+          The endpoint cost $c_b$ requires optimizing over trajectories. We use an equivalent deterministic control formulation to train the flow map through policy iteration.
         </p>
       </div>
 
@@ -295,72 +333,68 @@
       </div>
       <div class="prose">
         <p>
-          The Wasserstein-tilted objective has the same optimal value as this control problem, and its optimal control
-          $u^*$ produces the Wasserstein-tilted distribution. The optimal model is again a single drift $b_t+u^*_t$, which replaces $b_t$ at inference.
+          The control $u_t$ modifies the pre-trained drift $b_t$, with a quadratic penalty on its magnitude. This problem has the same optimal value as the transport-regularized objective. An optimal control $u^*$ produces the Wasserstein-tilted terminal distribution through the drift $b_t+u^*_t$.
         </p>
         <p>
-          The optimal control is the gradient of the optimal value, $u^*_t=\nabla_x V^*_t$. Policy iteration regresses the trainable control onto the value gradient $\nabla_x V^{\bar u}$ of a frozen reference $\bar u$ and then updates the reference. At the population level, a performance-difference identity shows that each step improves the objective until the fixed point, which is the optimal control.
+          The value $V^u_t(x)$ is the terminal reward minus the remaining control cost along the trajectory starting from $x$ at time $t$. The optimal control satisfies $u^*_t=\nabla_x V^*_t$. We regress the trainable control onto $\nabla_x V^{\bar u}$ for a frozen reference $\bar u$, then update the reference. Each round improves the objective until the fixed point, which is the optimal control.
         </p>
       </div>
 
       <h3 class="sub-heading">Simulation-free value estimation</h3>
       <p class="sub-lede">
-        The value gradient normally requires simulating and backpropagating through the entire future trajectory, or
-        training a critic to approximate it. A pre-trained flow map jumps between any two times in one evaluation.
+        A flow map predicts the state at a later time in one evaluation. We use these transitions to estimate the value and its gradient without numerically integrating the full future trajectory.
       </p>
       <div class="valuefig" id="valuefig">
         <article class="vf-panel" data-kind="ac" data-aria="Actor-critic: the state passes once through a learned critic network that outputs the value estimate.">
-          <div class="vf-head"><h4>Actor-critic</h4><span class="vf-calls">forward calls <b>0</b></span></div>
+          <div class="vf-head"><h4>Actor-critic</h4><span class="vf-calls">critic evaluations <b>0</b></span></div>
           <div class="vf-stage"></div>
           <div class="vf-bar" aria-hidden="true"><i></i></div>
-          <p>A learned critic predicts the value in one call, so the estimate is only as good as the critic.</p>
-          <ul class="vf-badges"><li class="good"><i>O</i>(1)</li><li class="bad">biased</li><li class="bad">needs a critic</li></ul>
+          <p>A learned critic predicts the value in one evaluation. Differentiating the critic gives an approximate value gradient.</p>
+          <ul class="vf-badges"><li class="good"><i>O</i>(1) evaluations</li><li class="bad">learned approximation</li><li class="bad">critic training</li></ul>
         </article>
         <article class="vf-panel" data-kind="rollout" data-aria="Multi-step rollout: the state is simulated through T network calls to reach x_1, then the gradient is backpropagated through all T steps.">
-          <div class="vf-head"><h4>Multi-step rollout</h4><span class="vf-calls">forward calls <b>0</b></span></div>
+          <div class="vf-head"><h4>Multi-step rollout</h4><span class="vf-calls">drift evaluations <b>0</b></span></div>
           <div class="vf-stage"></div>
           <div class="vf-bar" aria-hidden="true"><i></i></div>
-          <p>The flow is simulated for $T$ steps and differentiated through all of them, so every update pays for the whole trajectory.</p>
-          <ul class="vf-badges"><li class="good">unbiased</li><li class="bad"><i>O</i>(<i>T</i>) calls</li><li class="bad"><i>O</i>(<i>T</i>) memory</li></ul>
+          <p>A numerical solver generates the trajectory in $T$ steps. Backpropagation differentiates through those steps to compute the value gradient.</p>
+          <ul class="vf-badges"><li class="bad"><i>O</i>(<i>T</i>) evaluations</li><li class="bad">backprop through <i>T</i> steps</li></ul>
         </article>
         <article class="vf-panel ours" data-kind="wtf" data-aria="WTF: two flow-map jumps reach x_1 from x_t through an intermediate time tau, and one Jacobian backprop returns the value gradient.">
-          <div class="vf-head"><h4>WTF (ours)</h4><span class="vf-calls">forward calls <b>0</b></span></div>
+          <div class="vf-head"><h4>WTF</h4><span class="vf-calls">flow-map transitions <b>0</b></span></div>
           <div class="vf-stage"></div>
           <div class="vf-bar" aria-hidden="true"><i></i></div>
-          <p>Two flow-map jumps reach $x_1$ from $x_t$, and one Jacobian backprop returns the value gradient.</p>
-          <ul class="vf-badges"><li class="good">unbiased</li><li class="good"><i>O</i>(1)</li><li class="good">no critic</li></ul>
+          <p>Two flow-map transitions produce $x_\tau$ and $x_1$ from $x_t$. Differentiating the resulting value estimate gives the value-gradient target.</p>
+          <ul class="vf-badges"><li class="good">Monte Carlo estimate</li><li class="good"><i>O</i>(1) transitions</li><li class="good">critic-free</li></ul>
         </article>
       </div>
 
       <div class="prose">
         <p>
-          Writing the remaining control cost as an average over a uniformly sampled time $\tau$ gives an unbiased single-sample estimate of the value, with both states produced by flow-map jumps.
+          Sampling $\tau$ uniformly from the remaining time interval converts the integrated control cost into a single-sample Monte Carlo estimate. The flow map supplies the intermediate state $x_\tau$ and terminal state $x_1$.
         </p>
       </div>
       <div class="keybox narrow">
         $$\widehat V(t,x)=\lambda\, r(x_1)-\frac{1-t}{2}\,\big\|\bar u_\tau(x_\tau)\big\|^2,\qquad
           \tau\sim\mathrm{U}[t,1],\quad x_\tau=X^{\bar u}_{t,\tau}(x),\quad x_1=X^{\bar u}_{\tau,1}(x_\tau)$$
       </div>
-      <div class="prose"><p>The flow map gives $x_1$ without simulating the trajectory, so the only Monte Carlo approximation is the scalar time integral.</p></div>
+      <div class="prose"><p>For the flow map of the reference dynamics, this estimator is unbiased. Its only randomness comes from sampling the time $\tau$.</p></div>
 
       <h3 class="sub-heading">The WTF objective</h3>
       <div class="keybox narrow accent">
         $$\mathcal{L}_{\mathrm{WTF}}(\hat w)=\mathbb{E}\Big[\big\|\hat w_{t,t}(\bar x_t)-b_t(\bar x_t)-\nabla_x\widehat V(t,\bar x_t)\big\|^2\Big]
           +\beta\,\mathcal{L}_{\mathrm{dist}}(\hat w),\qquad \bar w=\mathrm{sg}(\hat w)$$
-        <p class="framing-note">Value-gradient regression on the diagonal, flow map self-distillation off the diagonal.
-          Distillation keeps the output a flow map, and that flow map keeps supplying amortized on-policy rollouts for
-          the next value estimate.</p>
+        <p class="framing-note">The diagonal loss fits the controlled drift to the value-gradient target. Off-diagonal self-distillation trains the flow map to remain consistent with that drift and supplies on-policy states for subsequent updates. The frozen reference $\bar w$ and regression targets are held fixed when updating $\hat w$.</p>
       </div>
 
       <div class="algobox">
         <p class="algo-tag">One training step of WTF</p>
         <ol>
           <li>Sample $x_0\sim\rho_0$, $t\sim\mathrm{U}[0,1]$, $\tau\sim\mathrm{U}[t,1]$.</li>
-          <li>Jump with the frozen flow map to $\bar x_t=X^{\bar w}_{0,t}(x_0)$, $\bar x_\tau=X^{\bar w}_{t,\tau}(\bar x_t)$ and $\bar x_1=X^{\bar w}_{\tau,1}(\bar x_\tau)$.</li>
-          <li>Estimate the value $\widehat V$ and backpropagate once to get $\widehat g=\nabla_{\bar x_t}\widehat V$.</li>
-          <li>Regress $\hat w_{t,t}(\bar x_t)$ onto $b_t(\bar x_t)+\widehat g$ and add the self-distillation loss.</li>
+          <li>Evaluate the frozen flow map to obtain $\bar x_t=X^{\bar w}_{0,t}(x_0)$, $\bar x_\tau=X^{\bar w}_{t,\tau}(\bar x_t)$ and $\bar x_1=X^{\bar w}_{\tau,1}(\bar x_\tau)$.</li>
+          <li>Compute $\widehat V$ and differentiate with respect to $\bar x_t$ to obtain $\widehat g=\nabla_{\bar x_t}\widehat V$.</li>
+          <li>Regress $\hat w_{t,t}(\bar x_t)$ onto $b_t(\bar x_t)+\widehat g$ with the target held fixed, and update the model using the regression and self-distillation losses.</li>
         </ol>
-        <p class="algo-note">At the population level every fixed point is the optimal control, and the output remains a flow map.</p>
+        <p class="algo-note">At its fixed point, training recovers the optimal controlled drift together with its flow map.</p>
       </div>
     </section>
 
@@ -370,16 +404,16 @@
         <span class="kicker">Results</span>
         <h2>Reward and training compute</h2>
         <p>
-          We fine-tune DMF-XL/2 on ImageNet-256 and TiM-T2I for text-to-image, both against HPSv2, using the Euclidean reward gradient that drops the flow-map Jacobian from the reward term. WTF achieves higher reward with comparable or higher diversity than the baselines, and the same fine-tuned flow map remains effective at few steps without post-hoc distillation.
+          WTF achieves higher reward with comparable or higher diversity on ImageNet-256 and text-to-image, while retaining few-step inference with the same fine-tuned checkpoint. We fine-tune DMF-XL/2 and TiM-T2I using HPSv2 as the reward. Both image experiments use the Euclidean reward gradient, which omits the flow-map Jacobian from the reward term while preserving the generated endpoint.
         </p>
       </div>
 
       <figure class="cfig" id="computefig" data-src="assets/data/compute_curves.json">
         <div class="cf-stage"></div>
         <figcaption>
-          <strong>Reward against training compute.</strong> Text-to-image HPSv2 at 50 NFE, every method fine-tuned from
-          the same flow map on one 8×H100 node. Each span runs from where WTF first reaches a baseline's peak reward to
-          where that baseline does. Shading is ±1 standard error.
+          Text-to-image HPSv2 at 50 NFE against cumulative training compute. All methods start from the same flow map.
+          Each horizontal span runs from where WTF first reaches a baseline's peak reward to where that baseline reaches it. WTF requires up to $280\times$ less compute than Flow-GRPO and $47\times$ less than Adjoint Matching at
+          these reward levels. Shading denotes one standard error above and below the mean.
         </figcaption>
       </figure>
 
@@ -403,9 +437,9 @@
     <section class="section" id="gallery">
       <div class="section-heading">
         <span class="kicker">Gallery</span>
-        <h2>Qualitative examples</h2>
+        <h2>Samples across inference budgets</h2>
         <p>
-          The text-to-image rows are the prompts from the paper appendix, and the ImageNet-256 rows show eighteen classes from the paper checkpoint. Within a row every WTF panel starts from the same initial noise, so the row follows a single sample as the budget grows.
+          The same fine-tuned checkpoint generates samples at each inference budget. Within each row, the WTF samples use the same initial noise and conditioning.
         </p>
       </div>
 
@@ -413,15 +447,11 @@
         <button type="button" class="pill-tab active" data-qual="t2i">Text-to-image</button>
         <button type="button" class="pill-tab" data-qual="imagenet">ImageNet-256</button>
       </div>
-      <div class="qual" id="qual">
-        <div class="qual-viewport">
-          <button class="qual-nav prev" type="button" aria-label="Previous example"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
-          <button class="qual-nav next" type="button" aria-label="Next example"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
-          <div class="qual-labels" id="qual-labels"></div>
-          <img loading="lazy" decoding="async" class="qual-img" id="qual-img" alt="">
-        </div>
-        <p class="qual-prompt" id="qual-prompt"></p>
-        <div class="qual-foot"><div class="qual-dots" id="qual-dots"></div><span class="qual-counter" id="qual-counter"></span></div>
+      <div class="reel" id="qual" aria-roledescription="carousel" aria-label="Qualitative examples">
+        <button class="reel-nav prev" type="button" aria-label="Previous example"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></button>
+        <button class="reel-nav next" type="button" aria-label="Next example"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></button>
+        <div class="reel-window"><div class="reel-track"></div></div>
+        <div class="reel-foot"><span class="reel-counter"></span><span class="reel-progress" aria-hidden="true"><i></i></span></div>
       </div>
     </section>
 
@@ -448,19 +478,11 @@
     
   </footer>
 
-  <div class="theme-picker" id="theme-picker" aria-label="Design options">
-    <p>Design option</p>
-    <button type="button" data-theme-set="carbon">Carbon</button>
-    <button type="button" data-theme-set="violet">Violet</button>
-    <button type="button" data-theme-set="ember">Ember</button>
-    <button type="button" data-theme-set="night">Night</button>
-  </div>
-
-  <script src="assets/js/tilt-lab.js?v=30"></script>
-  <script src="assets/js/main.js?v=30"></script>
-  <script src="assets/js/computefig.js?v=30"></script>
-  <script src="assets/js/valuefig.js?v=30"></script>
-  <script src="assets/js/qual.js?v=30"></script>
+  <script src="assets/js/tilt-lab.js?v=48"></script>
+  <script src="assets/js/main.js?v=48"></script>
+  <script src="assets/js/computefig.js?v=48"></script>
+  <script src="assets/js/valuefig.js?v=48"></script>
+  <script src="assets/js/qual.js?v=48"></script>
 </body>
 
 </html>

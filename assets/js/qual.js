@@ -75,39 +75,98 @@
     ],
     imagenet: inClasses.map(([c, name]) => ({ src: `assets/qual/imagenet/c${pad(c)}.webp`, labels: IN_BUDGET, text: name })),
   };
-  const img = document.getElementById('qual-img');
-  if (!img) return;
-  const labels = document.getElementById('qual-labels'), prompt = document.getElementById('qual-prompt'),
-    counter = document.getElementById('qual-counter'), dots = document.getElementById('qual-dots');
-  let tab = 't2i', idx = 0, near = false;
-  new IntersectionObserver((es, o) => { if (es[0].isIntersecting) { near = true; render(); o.disconnect(); } },
-    { rootMargin: '600px 0px' }).observe(img);
-  const render = () => {
-    const s = Q[tab][idx];
-    img.src = s.src; img.alt = s.text;
-    labels.style.gridTemplateColumns = `repeat(${s.labels.length}, 1fr)`;
-    labels.innerHTML = s.labels.map(l => `<span class="${l.startsWith('WTF') ? 'ours' : ''}">${l}</span>`).join('');
-    prompt.textContent = s.text;
-    counter.textContent = `${idx + 1} / ${Q[tab].length}`;
-    dots.querySelectorAll('.qual-dot').forEach((d, i) => d.classList.toggle('on', i === idx));
-    if (near) { const nxt = Q[tab][(idx + 1) % Q[tab].length]; new Image().src = nxt.src; }   // preload the next slide
+  /* Reel: slides sit side by side, the active one centred with its neighbours dimmed at the edges.
+     The track holds K clones of the last slides before the first and of the first slides after the last,
+     so moving past either end continues seamlessly and then snaps (without animation) to the real slide.
+     It advances by itself every DWELL ms while on screen and pauses under the pointer. Any manual control
+     (arrows, a click on a neighbour, horizontal scroll or swipe, arrow keys) stops the auto-advance until
+     the gallery leaves the screen and comes back. */
+  const reel = document.getElementById('qual');
+  if (!reel) return;
+  const win = reel.querySelector('.reel-window'), track = reel.querySelector('.reel-track');
+  const counter = reel.querySelector('.reel-counter'), prog = reel.querySelector('.reel-progress'), bar = prog.querySelector('i');
+  const DWELL = 5000, K = 2, still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let tab = 't2i', n = 0, pos = K, slides = [], elapsed = 0, last = 0, raf = 0;
+  let hover = false, inView = false, user = false;
+  const esc = (s) => s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+  const slideHTML = (s) => `<figure class="reel-slide">
+      <div class="qual-labels" style="grid-template-columns:repeat(${s.labels.length},1fr)">${
+        s.labels.map(l => `<span class="${l.startsWith('WTF') ? 'ours' : ''}">${l}</span>`).join('')}</div>
+      <img loading="lazy" decoding="async" src="${s.src}" alt="${esc(s.text)}">
+      <figcaption class="qual-prompt">${esc(s.text)}</figcaption></figure>`;
+  const real = () => ((pos - K) % n + n) % n;
+  const layout = (animate = true) => {
+    if (!slides.length) return;
+    const W = win.clientWidth, sw = slides[0].offsetWidth, gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+    track.style.transition = animate ? '' : 'none';
+    slides.forEach(s => { s.style.transition = animate ? '' : 'none'; });
+    track.style.transform = `translateX(${(W - sw) / 2 - pos * (sw + gap)}px)`;
+    slides.forEach((s, i) => s.classList.toggle('active', i === pos));
+    [pos, pos - 1, pos + 1, pos + 2].forEach(j => { if (slides[j]) slides[j].querySelector('img').loading = 'eager'; });
+    counter.textContent = `${real() + 1} / ${n}`;
+    if (!animate) { void track.offsetWidth; track.style.transition = ''; slides.forEach(s => { s.style.transition = ''; }); }
   };
+  // after sliding onto a clone, jump to the real slide with the same content
+  const normalize = () => {
+    if (pos >= n + K || pos < K) { pos = real() + K; layout(false); }
+  };
+  track.addEventListener('transitionend', (e) => { if (e.target === track) normalize(); });
+  const step = (d) => { normalize(); pos += d; elapsed = 0; layout(); };
+  const takeControl = () => { user = true; elapsed = 0; prog.classList.add('off'); };
   const build = () => {
-    dots.innerHTML = Q[tab].map((_, i) => `<button type="button" class="qual-dot" aria-label="Example ${i + 1}"></button>`).join('');
-    dots.querySelectorAll('.qual-dot').forEach((d, i) => d.addEventListener('click', () => { idx = i; render(); }));
-    render();
+    const items = Q[tab]; n = items.length;
+    const all = [...items.slice(n - K), ...items, ...items.slice(0, K)];
+    track.innerHTML = all.map(slideHTML).join('');
+    slides = [...track.children];
+    slides.forEach((s, i) => s.addEventListener('click', () => {
+      if (i === pos) return;
+      takeControl(); normalize();
+      pos += (i - pos); elapsed = 0; layout();
+    }));
+    pos = K; elapsed = 0; layout(false);
   };
-  const step = (d) => { idx = (idx + d + Q[tab].length) % Q[tab].length; render(); };
-  document.querySelector('#qual .prev').addEventListener('click', () => step(-1));
-  document.querySelector('#qual .next').addEventListener('click', () => step(1));
+  const tick = (now) => {
+    if (last && !hover && !user && !still) elapsed += now - last;
+    last = now;
+    if (elapsed >= DWELL) step(1);
+    bar.style.width = `${Math.min(100, 100 * elapsed / DWELL)}%`;
+    raf = requestAnimationFrame(tick);
+  };
+  new IntersectionObserver((es) => es.forEach(e => {
+    inView = e.isIntersecting;
+    if (inView && !raf) { last = 0; raf = requestAnimationFrame(tick); }
+    if (!inView) {
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      user = false; elapsed = 0; prog.classList.remove('off');      // auto-advance resumes on the next visit
+    }
+  }), { threshold: 0.35 }).observe(reel);
+  reel.addEventListener('mouseenter', () => { hover = true; });
+  reel.addEventListener('mouseleave', () => { hover = false; });
+  reel.querySelector('.prev').addEventListener('click', (e) => { e.stopPropagation(); takeControl(); step(-1); });
+  reel.querySelector('.next').addEventListener('click', (e) => { e.stopPropagation(); takeControl(); step(1); });
+  let acc = 0, lock = 0;
+  win.addEventListener('wheel', (e) => {
+    if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+    e.preventDefault();
+    if (performance.now() < lock) return;
+    acc += e.deltaX;
+    if (Math.abs(acc) > 40) { takeControl(); step(Math.sign(acc)); acc = 0; lock = performance.now() + 550; }
+  }, { passive: false });
+  let x0 = null;
+  win.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; }, { passive: true });
+  win.addEventListener('touchend', (e) => {
+    if (x0 === null) return;
+    const dx = e.changedTouches[0].clientX - x0; x0 = null;
+    if (Math.abs(dx) > 40) { takeControl(); step(-Math.sign(dx)); }
+  }, { passive: true });
+  document.addEventListener('keydown', (e) => {
+    if (!inView) return;
+    if (e.key === 'ArrowLeft') { takeControl(); step(-1); } else if (e.key === 'ArrowRight') { takeControl(); step(1); }
+  });
   document.querySelectorAll('#qual-tabs .pill-tab').forEach(b => b.addEventListener('click', () => {
     document.querySelectorAll('#qual-tabs .pill-tab').forEach(x => x.classList.toggle('active', x === b));
-    tab = b.dataset.qual; idx = 0; build();
+    tab = b.dataset.qual; build();
   }));
-  document.addEventListener('keydown', (e) => {
-    const r = document.getElementById('qual').getBoundingClientRect();
-    if (r.top > innerHeight || r.bottom < 0) return;            // only when the clicker is on screen
-    if (e.key === 'ArrowLeft') step(-1); else if (e.key === 'ArrowRight') step(1);
-  });
+  addEventListener('resize', () => layout(false));
   build();
 })();

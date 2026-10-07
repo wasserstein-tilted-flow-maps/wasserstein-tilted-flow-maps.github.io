@@ -105,22 +105,6 @@
   }, { rootMargin: '-45% 0px -50% 0px' });
   document.querySelectorAll('main section[id]').forEach(s => obs.observe(s));
 
-  /* ---------------- design-option picker (review only: add ?options to the URL) ---------------- */
-  const picker = document.getElementById('theme-picker');
-  if (picker && new URLSearchParams(location.search).has('options')) {
-    picker.classList.add('show');
-    const sync = () => {
-      const cur = document.documentElement.getAttribute('data-theme');
-      picker.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.themeSet === cur));
-    };
-    picker.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
-      document.documentElement.setAttribute('data-theme', b.dataset.themeSet);
-      const q = new URLSearchParams(location.search); q.set('theme', b.dataset.themeSet);
-      history.replaceState(null, '', '?' + q.toString() + location.hash);
-      sync(); document.dispatchEvent(new Event('themechange'));
-    }));
-    sync();
-  }
 })();
 
 /* review aid: ?review loads every lazy image and the animation up front (for full-page screenshots) */

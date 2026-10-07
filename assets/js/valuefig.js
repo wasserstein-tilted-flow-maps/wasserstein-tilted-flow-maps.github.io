@@ -55,7 +55,7 @@
   /* ---------- panel builders: each returns draw(f) for f in [0,1) ---------- */
   function actorCritic(svg) {
     defs(svg, 'base');
-    const c = common(svg, 'base'); c.backLabel.textContent = 'backprop through the critic';
+    const c = common(svg, 'base'); c.backLabel.textContent = 'differentiate through the critic';
     el('line', { x1: 36, y1: 106, x2: 112, y2: 106, class: 'vf-wire', 'marker-end': 'url(#vf-fwd-base)' }, svg);
     el('line', { x1: 208, y1: 106, x2: 282, y2: 106, class: 'vf-wire', 'marker-end': 'url(#vf-fwd-base)' }, svg);
     const box = el('rect', { x: 114, y: 86, width: 92, height: 40, rx: 8, class: 'vf-critic' }, svg);
@@ -83,7 +83,7 @@
 
   function rollout(svg) {
     defs(svg, 'base');
-    const c = common(svg, 'base'); c.backLabel.textContent = `backprop through all T steps`;
+    const c = common(svg, 'base'); c.backLabel.textContent = `differentiate through the rollout`;
     const path = el('path', { d: BASE, class: 'vf-base' }, svg);
     const L = path.getTotalLength();
     const trail = el('path', { d: BASE, class: 'vf-trail' }, svg);
@@ -114,7 +114,7 @@
 
   function wtf(svg) {
     defs(svg, 'ours');
-    const c = common(svg, 'ours'); c.backLabel.textContent = 'one Jacobian backprop';
+    const c = common(svg, 'ours'); c.backLabel.textContent = 'differentiate the value estimate';
     const path = el('path', { d: BASE, class: 'vf-base faint' }, svg);
     const L = path.getTotalLength(), pt = path.getPointAtLength(L * 0.5);
     const J1 = `M30,106 Q${(30 + pt.x) / 2},${Math.max(106, pt.y) + 52} ${pt.x},${pt.y}`;
