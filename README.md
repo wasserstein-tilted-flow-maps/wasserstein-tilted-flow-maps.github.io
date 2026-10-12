@@ -1,33 +1,26 @@
 # WTF?! project page
 
-Static project page for *WTF?! Simulation-Free Reinforcement Learning with Wasserstein-Tilted Flow Maps*
-([arXiv:2609.27033](https://arxiv.org/abs/2609.27033)). Plain HTML/CSS/JS, no build step.
+Project page for *WTF?! Simulation-Free Reinforcement Learning with Wasserstein-Tilted Flow Maps*
+([arXiv:2609.27033](https://arxiv.org/abs/2609.27033)), served at https://wasserstein-tilted-flow-maps.github.io/.
+Code: [wasserstein-tilted-flow-maps/WTF](https://github.com/wasserstein-tilted-flow-maps/WTF).
+Checkpoints: [Hugging Face](https://huggingface.co/wasserstein-tilted-flow-maps/WTF).
 
-## Preview locally
+Plain HTML, CSS and JavaScript, with no build step. To preview locally:
 
 ```bash
-cd WTF_webpage && python3 -m http.server 8000
+python3 -m http.server 8000
 # open http://localhost:8000
 ```
-
-Design options for review: open `http://localhost:8000/?options` for a picker (bottom right) that switches
-between **Violet** (default), **Ember** and **Night**. `?theme=ember` / `?theme=night` also work directly.
-The picker never shows without `?options`.
-
-## Deploy on GitHub Pages
-
-1. In the `wasserstein-tilted-flow-maps` organization, create a repo named `wasserstein-tilted-flow-maps.github.io`
-   (served at https://wasserstein-tilted-flow-maps.github.io/).
-2. Copy the *contents* of this folder to the repo root and push.
-3. Settings → Pages → Source: *Deploy from a branch*, branch `main`, folder `/ (root)`.
 
 ## Layout
 
 ```
 index.html              page
-styles.css              design system + three themes
-assets/js/main.js       results tables (data transcribed from the paper), tabs, BibTeX copy, lightbox, nav
-assets/js/tilt-lab.js   interactive 1-D Wasserstein vs. KL tilt (exact port of the paper's synthetic experiment;
-                        matches Table 16 at λ = 7)
-assets/img/             figures exported from the paper; social.jpg is the 1200×630 link-preview card
+styles.css              styles
+assets/js/main.js       results tables (transcribed from the paper), tabs, BibTeX copy, lightbox, nav
+assets/js/tilt-lab.js   interactive 1-D Wasserstein vs. KL tilt (port of the paper's synthetic experiment)
+assets/js/valuefig.js   value-estimation figure
+assets/js/computefig.js reward vs. training compute figure
+assets/js/qual.js       tilt animation and sample gallery
+assets/                 images, video and figure data; img/social.jpg is the link-preview card
 ```
