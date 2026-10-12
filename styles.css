@@ -313,6 +313,7 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
 .lab-readout .r-kl strong { color: var(--c-kl); }
 .lab-readout .r-wtf strong { color: var(--c-wtf); }
 .lab-readout span { display: block; font-size: .78rem; color: var(--ink-soft); }
+.lab-readout p mjx-container { text-transform: none; letter-spacing: normal; }
 .lab-note { max-width: 760px; margin: 1.4rem auto 0; font-size: .92rem; color: var(--ink-soft); text-align: left; }
 
 /* ---------------- results ---------------- */
