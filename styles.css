@@ -543,12 +543,13 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
 @media (prefers-reduced-motion: reduce) { .hf-grid img:hover { animation: none; } }
 
 /* ---------------- simulation-free value estimation, native animated figure ---------------- */
-.valuefig { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.6rem auto 0; max-width: 1120px; }
+.valuefig { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin: 1.6rem 0 0;
+  width: min(1260px, 94vw); position: relative; left: 50%; transform: translateX(-50%); }
 .vf-panel { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 1rem 1.1rem 1.1rem;
   display: flex; flex-direction: column; box-shadow: var(--shadow); --vf-bg: var(--card-bg); }
 .vf-panel.ours { border-color: color-mix(in srgb, var(--accent) 40%, transparent); background: var(--ours-soft); --vf-bg: var(--ours-soft); }
-.vf-head { display: flex; align-items: baseline; justify-content: space-between; gap: .6rem; }
-.vf-head h4 { margin: 0; font-family: var(--display-font); font-weight: var(--display-weight); font-size: 1.08rem; color: var(--ink); }
+.vf-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: .1rem .6rem; }
+.vf-head h4 { margin: 0; white-space: nowrap; font-family: var(--display-font); font-weight: var(--display-weight); font-size: 1.08rem; color: var(--ink); }
 .vf-panel.ours .vf-head h4 { color: var(--accent); }
 .vf-calls { font: 500 .74rem var(--mono); color: var(--ink-faint); white-space: nowrap; }
 .vf-calls b { color: var(--ink); font-weight: 600; display: inline-block; min-width: 1.6em; text-align: right; }
@@ -559,7 +560,7 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
 .vf-bar i { display: block; height: 100%; width: 0; background: var(--ink-faint); border-radius: inherit; }
 .vf-panel.ours .vf-bar i { background: var(--accent); }
 .vf-panel p { margin: 0 0 .75rem; font-size: .9rem; color: var(--ink-soft); line-height: 1.5; flex: 1; text-align: left; }
-.vf-badges { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: nowrap; gap: .28rem; }
+.vf-badges { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .28rem; }
 .vf-badges li i { font-family: var(--serif); font-size: 1.08em; }
 .vf-badges li { font: 600 .69rem var(--sans); padding: .18rem .46rem; white-space: nowrap; border-radius: 999px; border: 1px solid var(--line-strong); color: var(--ink-soft); background: var(--panel); }
 .vf-badges li.good::before { content: '✓ '; color: var(--c-rew); }
@@ -590,7 +591,7 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
 .vf-back-mask { fill: none; stroke: var(--vf-bg); stroke-width: 8; }
 .vf-headfill.base { fill: var(--ink-faint); } .vf-headfill.ours { fill: var(--accent); }
 .vf-fwdfill.base { fill: var(--ink-soft); } .vf-fwdfill.ours { fill: var(--accent); }
-@media (max-width: 900px) { .valuefig { grid-template-columns: 1fr; max-width: 520px; } }
+@media (max-width: 900px) { .valuefig { grid-template-columns: 1fr; width: auto; max-width: 520px; left: auto; transform: none; margin: 1.6rem auto 0; } }
 
 /* ================= fewer boxes (Jerry 10-06: "we are just spamming boxes") =================
    A box is kept only for a self-contained instrument: the 1-D demo, the gallery clicker, the BibTeX code.
