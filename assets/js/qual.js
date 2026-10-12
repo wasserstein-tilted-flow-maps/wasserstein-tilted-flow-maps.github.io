@@ -1,6 +1,5 @@
-/* WTF project page: tilt animation, Tilt Lab auto-sweep and the qualitative clicker.
-   Clicker slides are cut from the paper's own composites (Fig. 1 front_hero, Figs. appx_t2i_1/2) by
-   /shared/wtf_launch/page_src/build_qual.py; prompts are verbatim from the paper's captions (Appendix I.2). */
+/* WTF project page: tilt animation, 1-D demo auto-sweep and the qualitative clicker.
+   Prompts are verbatim from the paper's appendix captions. */
 (function () {
   /* ---------- reweight-vs-transport animation: loops while in view, pauses when scrolled away ---------- */
   const vid = document.getElementById('tilt-anim');
@@ -11,7 +10,7 @@
       { threshold: 0.3 }).observe(vid);
   }
 
-  /* ---------- 1-D demo: sweep the reward location K while in view (FMRG pattern) ----------
+  /* ---------- 1-D demo: sweep the reward location K while in view ----------
      Restarts every time the lab scrolls back into view and pauses when it leaves. Touching a
      control hands it to the reader until the next re-entry. lambda stays at the slider value. */
   const lab = document.getElementById('tilt-lab'), kIn = document.getElementById('lab-k');
@@ -60,8 +59,7 @@
     'An image depicting the concept of yin and yang.',
     'Portrait of a creature with bat ears, a wolf snout and eagle features, wearing a poncho and helmet.',
     'The image is a drawing of a skeletal, frail figure driving a chariot pulled by two skeletal hounds.'];
-  // ImageNet-256: the paper checkpoint (IN_tcf15_detach_s1 @12500) from /shared/wtf_qual/in_gallery,
-  // every panel from the same initial noise (seed 1000*class + k, matched across models and NFE).
+  // ImageNet-256: every panel from the same initial noise (seed 1000*class + k, matched across models and NFE).
   const IN_BUDGET = ['Base · 50 steps', 'WTF · 1 step', 'WTF · 4 steps', 'WTF · 8 steps', 'WTF · 50 steps', 'WTF · 250 steps'];
   const inClasses = [[1, 'Goldfish'], [15, 'Robin'], [22, 'Bald eagle'], [33, 'Loggerhead turtle'], [37, 'Box turtle'],
     [47, 'African chameleon'], [84, 'Peacock'], [88, 'Macaw'], [90, 'Lorikeet'], [94, 'Hummingbird'], [96, 'Toucan'],

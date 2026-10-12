@@ -1,7 +1,6 @@
 /* ============================================================
    Tilt Lab: Wasserstein tilt vs. KL reward tilt in 1-D.
-   A direct port of the paper's synthetic experiment
-   (synthetic/three_panel_fig.py, Fig. 5 / Table 16):
+   A direct port of the paper's synthetic experiment:
      base       rho_0 = rho_1 = N(0, 1)
      reward     r_K(y) = exp(-(y-K)^2 / (2 w^2)),  w = 2.25
      KL tilt    rho_1(y) e^{lam r(y)} / Z           (exact quadrature)
@@ -106,7 +105,7 @@
     return { g, kl, wt, base: baseReward(K, g) };
   }
 
-  // exposed for verification against the paper's Table 16
+  // exposed for verification against the paper's synthetic experiment
   window.WTFTiltLab = { solve };
 
   /* ---------------- drawing ---------------- */

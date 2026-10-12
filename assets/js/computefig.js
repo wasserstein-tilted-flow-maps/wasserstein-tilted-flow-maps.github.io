@@ -1,7 +1,5 @@
-/* WTF project page: reward vs. cumulative training compute, rebuilt natively from the paper's own series
-   (assets/data/compute_curves.json, dumped by /shared/wtf_launch/page_src/compute_curves_web.py from
-   /home/jerry/wtf/wtf_curves3.py on the eval-log curves). On scroll-in a GPU-hours cursor sweeps left to right,
-   drawn static. */
+/* WTF project page: reward vs. cumulative training compute, drawn from the paper's curves
+   (assets/data/compute_curves.json). */
 (function () {
   const fig = document.getElementById('computefig');
   if (!fig) return;
@@ -89,6 +87,6 @@
       spans.forEach(s => s.g.classList.toggle('on', xv >= s.x1));
     };
 
-    render(1);                                    // static (Jerry 10-06: the plot should not be animated)
+    render(1);                                    // static
   });
 })();

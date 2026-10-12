@@ -1,8 +1,8 @@
-/* WTF project page: tables, tabs, BibTeX copy, lightbox, nav highlight, design picker. */
+/* WTF project page: tables, tabs, BibTeX copy, lightbox, nav highlight. */
 (function () {
   'use strict';
 
-  /* ---------------- results tables (transcribed from the paper, Tables 6 and 7) ---------------- */
+  /* ---------------- results tables (transcribed from the paper) ---------------- */
   // [method, NFE, HPSv2, PickScore, ImageReward, DreamSim, CLIP, isOurs]
   const T2I = [
     ['Base model', 1, 0.228, 20.36, 0.182, 0.548, 0.413],
@@ -68,9 +68,6 @@
     });
   });
 
-  // placeholder links (e.g. Code before release) should not jump to the top
-  document.querySelectorAll('.btn-soon').forEach(a => a.addEventListener('click', e => e.preventDefault()));
-
   /* ---------------- BibTeX copy ---------------- */
   const copyBtn = document.getElementById('copy-bib');
   if (copyBtn) copyBtn.addEventListener('click', async () => {
@@ -103,10 +100,3 @@
 
 })();
 
-/* review aid: ?review loads every lazy image and the animation up front (for full-page screenshots) */
-(() => {
-  if (!new URLSearchParams(location.search).has("review")) return;
-  document.querySelectorAll("img[loading=lazy]").forEach(i => { i.loading = "eager"; });
-  const v = document.getElementById("tilt-anim");
-  if (v) { v.poster = v.dataset.poster; v.preload = "auto"; v.load(); }
-})();

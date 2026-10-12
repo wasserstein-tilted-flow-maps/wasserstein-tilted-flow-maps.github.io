@@ -1,4 +1,4 @@
-/* WTF project page: "Simulation-free value estimation" figure, rebuilt natively (paper Fig. value_estimation).
+/* WTF project page: "Simulation-free value estimation" figure, rebuilt natively from the paper's figure.
    Three panels share one clock: a forward pass (actor-critic: 1 call through a learned critic; rollout: T steps;
    WTF: two flow-map jumps), then the backward pass (one arc each; the rollout's is slow because it spans T steps).
    Loops while in view, pauses when scrolled away, static final frame under prefers-reduced-motion. */
@@ -156,8 +156,6 @@
     p.bar.style.width = (100 * n / T_CALLS) + '%';
   });
 
-  const freeze = new URLSearchParams(location.search).get('vf');      // review aid: ?vf=0.3 freezes that frame
-  if (freeze !== null) { render(+freeze); return; }
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) { render(0.99); return; }
   let raf = 0, t0 = 0;
   const frame = (now) => { if (!t0) t0 = now; render(((now - t0) % CYCLE) / CYCLE); raf = requestAnimationFrame(frame); };
