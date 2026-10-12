@@ -26,17 +26,14 @@
     ['WTF (ours)', 250, 0.330, 20.45, 0.718, 0.460, 0.177, true],
   ];
   const NOTES = {
-    t2i: 'TiM-T2I, HPSv2 as the training reward. Every method is fine-tuned under the same budget of roughly 48 GPU-hours on one 8×H100 node. WTF is one fine-tuned flow map evaluated at four inference budgets. Highest value among fine-tuned methods in each reward column is highlighted.',
-    imagenet: 'DMF-XL/2, HPSv2 as the training reward. WTF is evaluated at 1 and 250 NFE from the same fine-tuned flow map, and its results are means over three matched seeds. Highest value among fine-tuned methods in each reward column is highlighted.',
+    t2i: 'TiM-T2I, HPSv2 as the training reward. Every method is fine-tuned under the same budget of roughly 48 GPU-hours on one 8×H100 node. WTF is one fine-tuned flow map evaluated at four inference budgets.',
+    imagenet: 'DMF-XL/2, HPSv2 as the training reward. WTF is evaluated at 1 and 250 NFE from the same fine-tuned flow map, and its results are means over three matched seeds.',
   };
 
   function buildTable(rows, id) {
     const el = document.getElementById(id);
     if (!el) return;
     const decs = [3, 2, 3, 3, 3];
-    // best reward among fine-tuned rows (exclude base), reward columns only (idx 2..4)
-    const tuned = rows.filter(r => !/^Base/.test(r[0]));
-    const best = [2, 3, 4].map(c => Math.max(...tuned.map(r => r[c])));
     let h = '<thead><tr><th class="ta-l" rowspan="1"></th><th></th>' +
       '<th colspan="3">Reward ↑</th><th colspan="2">Diversity ↑</th></tr>' +
       '<tr><th class="ta-l">Method</th><th>NFE</th><th>HPSv2</th><th>PickScore</th><th>ImageReward</th>' +
@@ -49,8 +46,7 @@
       h += `<tr class="${cls}"><td class="ta-l${group === 'base' ? ' muted' : ''}">${r[0]}</td><td>${r[1]}</td>`;
       for (let c = 2; c <= 6; c++) {
         const v = r[c], txt = (v < 0 ? '−' : '') + Math.abs(v).toFixed(decs[c - 2]);
-        const isBest = c <= 4 && group !== 'base' && Math.abs(v - best[c - 2]) < 1e-9;
-        h += `<td${isBest ? ' class="best"' : ''}>${txt}</td>`;
+        h += `<td>${txt}</td>`;
       }
       h += '</tr>';
     });
