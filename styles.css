@@ -284,7 +284,7 @@ mjx-container[display="true"] { margin: .6em 0 !important; }
 .lab-plot { position: relative; padding: 1.2rem 1.2rem .4rem; }
 .lab-plot canvas { width: 100%; height: clamp(250px, 38vw, 360px); display: block; }
 .lab-legend { display: flex; flex-wrap: wrap; gap: 1.2rem; justify-content: center; padding: 0 1rem .4rem; font-size: .86rem; color: var(--ink-soft); }
-.lab-legend span { display: inline-flex; align-items: center; gap: .45rem; }
+.lab-legend > span { display: inline-flex; align-items: center; gap: .45rem; }
 .lab-legend i { width: 22px; height: 3px; border-radius: 3px; display: inline-block; }
 .lab-legend i.dash { background: repeating-linear-gradient(90deg, var(--c-rew) 0 6px, transparent 6px 10px) !important; height: 3px; }
 .lab-controls {
