@@ -44,7 +44,6 @@
       <a href="#algorithm">Algorithm</a>
       <a href="#results">Results</a>
       <a href="#gallery">Gallery</a>
-      <a href="#prequel">FMRG</a>
     </div>
   </nav>
 
@@ -200,13 +199,7 @@
 
       <blockquote class="question">Is there an efficient framework for direct end-to-end fine-tuning of a deterministic flow map?</blockquote>
       <p class="mot-close">
-        Previously, <a href="https://flow-map-reward-guidance.github.io/" target="_blank" rel="noopener">Flow Map
-        Reward Guidance</a> suggested that one can avoid the KL tilt through deterministic optimal control for efficient inference-time guidance.
-        WTF expands on this perspective and develops a new regularizer for fine-tuning: a transport cost that
-        measures how much the pre-trained flow must be steered. Unlike KL reward tilting, the resulting objective
-        transports individual samples toward higher reward rather than reweighting the base distribution. Fine-tuning
-        then becomes a deterministic optimal control problem, which a pre-trained flow map solves without simulating
-        rollouts. The result is <strong>simulation-free reinforcement learning</strong> for flows.
+        WTF replaces the KL term with a cost that measures how much the pre-trained flow must be steered. Fine-tuning then becomes a deterministic control problem, which a pre-trained flow map lets us solve without simulating rollouts. The result is <strong>simulation-free reinforcement learning</strong> for flows.
       </p>
     </section>
 
