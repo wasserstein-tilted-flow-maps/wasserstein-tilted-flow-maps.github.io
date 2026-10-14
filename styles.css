@@ -84,13 +84,13 @@ a { color: var(--accent); }
   border-bottom: 1px solid var(--line);
 }
 .nav-brand {
-  font-family: var(--serif); font-weight: 700; font-size: 1.2rem; text-decoration: none;
+  font-family: var(--serif); font-weight: 700; font-size: 1.32rem; text-decoration: none;
   letter-spacing: .01em;
   color: var(--hot);
 }
 .nav-links { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(.6rem, 2.4vw, 1.6rem); }
 .nav-links a {
-  color: var(--ink-soft); text-decoration: none; font-size: .9rem; font-weight: 500;
+  color: var(--ink-soft); text-decoration: none; font-size: 1rem; font-weight: 500;
   padding: .25rem 0; position: relative; white-space: nowrap;
 }
 .nav-links a:hover { color: var(--ink); }
@@ -776,7 +776,7 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
 
 /* counterpart site button (FMRG) with a fade transition */
 .site-nav .swap { flex-shrink: 0; white-space: nowrap; padding: .32rem .8rem; border-radius: 999px; background: var(--accent);
-  color: #fff; font-size: .82rem; font-weight: 600; text-decoration: none; }
+  color: #fff; font-size: .92rem; font-weight: 600; text-decoration: none; }
 .site-nav .swap:hover { background: color-mix(in srgb, var(--accent) 85%, var(--ink)); }
 html.leaving body { opacity: 0; transform: translateY(-14px); transition: opacity .55s ease, transform .55s ease; }
 @media (prefers-reduced-motion: reduce) { html.leaving body { transition: none; } }
