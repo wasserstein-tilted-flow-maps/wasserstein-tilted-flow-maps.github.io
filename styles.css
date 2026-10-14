@@ -778,5 +778,5 @@ input[type=range] { width: 100%; accent-color: var(--accent); }
 .site-nav .swap { flex-shrink: 0; white-space: nowrap; padding: .32rem .8rem; border-radius: 999px; background: var(--accent);
   color: #fff; font-size: .82rem; font-weight: 600; text-decoration: none; }
 .site-nav .swap:hover { background: color-mix(in srgb, var(--accent) 85%, var(--ink)); }
-html.leaving body { opacity: 0; transform: translateY(-6px); transition: opacity .35s ease, transform .35s ease; }
+html.leaving body { opacity: 0; transform: translateY(-14px); transition: opacity .55s ease, transform .55s ease; }
 @media (prefers-reduced-motion: reduce) { html.leaving body { transition: none; } }
